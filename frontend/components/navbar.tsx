@@ -20,6 +20,7 @@ import {
   Star,
   X,
   Filter,
+  Menu,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,13 +34,35 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [scrollPosition, setScrollPosition] = useState(0)
   const [searchQuery, setSearchQuery] = useState("")
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchResults, setSearchResults] = useState([])
   const [showSearchResults, setShowSearchResults] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const searchRef = useRef(null)
   const dropdownRef = useRef(null)
   const { state } = useCart()
+
+  // Handle scroll behavior
+  useEffect(() => {
+    let ticking = false
+    
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const currentScroll = window.scrollY
+          setScrollPosition(currentScroll)
+          setIsScrolled(currentScroll > 20)
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -54,14 +77,6 @@ export function Navbar() {
 
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   // Mock search functionality
@@ -138,35 +153,62 @@ export function Navbar() {
   ]
 
   const quickLinks = [
-    { name: "Home Page", icon: Home, href: "/" },
-    { name: "Bundles deals", icon: Package, href: "/bundles" },
+    { name: "Home", icon: Home, href: "/" },
+    { name: "Bundles", icon: Package, href: "/bundles" },
     { name: "Offers", icon: Target, href: "/offers" },
     { name: "Pay Bills", icon: CreditCard, href: "/pay-bills" },
   ]
 
+  // Calculate navbar transform based on scroll
+  const navbarTransform = isScrolled ? Math.max(-100, -scrollPosition / 2) : 0
+
   return (
     <>
       <motion.nav
-        className={`${isScrolled ? "fixed top-0 left-0 right-0 z-50 shadow-2xl backdrop-blur-md bg-[#1a1a1a]/95" : ""} bg-[#1a1a1a] border-b border-gray-700 transition-all duration-300`}
-        initial={{ y: 0 }}
+        className={`fixed top-0 left-0 right-0 z-50 bg-[#1a1a1a] border-b border-gray-700 transition-all duration-300 ${
+          isScrolled ? "shadow-2xl backdrop-blur-md bg-[#1a1a1a]/95" : ""
+        }`}
+        style={{
+          transform: `translateY(${navbarTransform}px)`,
+        }}
+        initial={{ y: -100 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ 
+          type: "spring", 
+          stiffness: 300, 
+          damping: 30,
+          duration: 0.3 
+        }}
       >
         {/* Top Bar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <motion.div className="flex items-center" whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+            <motion.div 
+              className="flex items-center" 
+              whileHover={{ scale: 1.05 }} 
+              transition={{ duration: 0.2 }}
+            >
               <Link href="/" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center shadow-lg">
                   <span className="text-white font-bold text-sm">OC</span>
                 </div>
-                <span className="text-white text-xl font-semibold">OneCard</span>
+                <span className="text-white text-xl font-semibold hidden sm:block">OneCard</span>
               </Link>
             </motion.div>
 
-            {/* Search Bar */}
-            <div className="flex-1 max-w-2xl mx-8 relative" ref={searchRef}>
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden text-white hover:bg-gray-700/50 p-2"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+
+            {/* Search Bar - Hidden on mobile */}
+            <div className="hidden md:flex flex-1 max-w-2xl mx-8 relative" ref={searchRef}>
               <motion.div 
                 className="relative" 
                 whileFocus={{ scale: 1.02 }} 
@@ -266,12 +308,12 @@ export function Navbar() {
             </div>
 
             {/* User Actions */}
-            <div className="flex items-center space-x-3">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <div className="flex items-center space-x-2">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden sm:block">
                 <Link href="/login">
-                  <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-lg px-3 py-2">
+                  <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-lg px-3 py-2 text-sm">
                     <User className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Login / Register</span>
+                    Login
                   </Button>
                 </Link>
               </motion.div>
@@ -303,8 +345,8 @@ export function Navbar() {
             </div>
           </div>
 
-          {/* Navigation Bar */}
-          <div className="border-t border-gray-700 py-3">
+          {/* Navigation Bar - Desktop */}
+          <div className="hidden md:block border-t border-gray-700 py-3">
             <div className="flex items-center space-x-4">
               {/* Categories Dropdown */}
               <div className="relative" ref={dropdownRef}>
@@ -314,8 +356,8 @@ export function Navbar() {
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   >
                     <span className="mr-2 text-lg">≡</span>
-                    <span className="hidden md:inline">Shopping Categories</span>
-                    <span className="md:hidden">Categories</span>
+                    <span className="hidden lg:inline">Shopping Categories</span>
+                    <span className="lg:hidden">Categories</span>
                     <ChevronDown
                       className={`ml-2 h-4 w-4 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
                     />
@@ -407,7 +449,6 @@ export function Navbar() {
                     key={link.name}
                     whileHover={{ scale: 1.05 }} 
                     whileTap={{ scale: 0.95 }}
-                    className="hidden md:block"
                   >
                     <Link href={link.href}>
                       <Button
@@ -415,7 +456,7 @@ export function Navbar() {
                         className="text-gray-300 hover:text-white hover:bg-gray-700/50 px-3 py-2 rounded-lg flex items-center transition-all duration-200 text-sm"
                       >
                         <IconComponent className="mr-2 h-4 w-4" />
-                        {link.name}
+                        <span className="hidden lg:inline">{link.name}</span>
                       </Button>
                     </Link>
                   </motion.div>
@@ -423,11 +464,107 @@ export function Navbar() {
               })}
             </div>
           </div>
+
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="md:hidden border-t border-gray-700 py-3 overflow-hidden"
+              >
+                <div className="space-y-2">
+                  {/* Mobile Search */}
+                  <div className="relative mb-3" ref={searchRef}>
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      type="text"
+                      placeholder="Search..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => searchQuery && setShowSearchResults(true)}
+                      className="w-full pl-10 pr-4 py-2 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 rounded-lg"
+                    />
+                  </div>
+
+                  {/* Mobile Quick Links */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {quickLinks.map((link) => {
+                      const IconComponent = link.icon
+                      return (
+                        <Link key={link.name} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>
+                          <Button
+                            variant="ghost"
+                            className="w-full text-gray-300 hover:text-white hover:bg-gray-700/50 px-3 py-2 rounded-lg flex items-center transition-all duration-200 text-sm"
+                          >
+                            <IconComponent className="mr-2 h-4 w-4" />
+                            {link.name}
+                          </Button>
+                        </Link>
+                      )
+                    })}
+                  </div>
+
+                  {/* Mobile Categories Button */}
+                  <Button
+                    variant="outline"
+                    className="w-full text-left justify-between bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  >
+                    <span>Browse Categories</span>
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
+                    />
+                  </Button>
+
+                  {/* Mobile Categories Dropdown */}
+                  <AnimatePresence>
+                    {isDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="grid grid-cols-2 gap-2 mt-2 pl-2">
+                          {categories.slice(0, 6).map((category) => {
+                            const IconComponent = category.icon
+                            return (
+                              <Link 
+                                key={category.name} 
+                                href="/products" 
+                                onClick={() => {
+                                  setIsDropdownOpen(false)
+                                  setIsMobileMenuOpen(false)
+                                }}
+                              >
+                                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-700/50">
+                                  <div
+                                    className={`w-8 h-8 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center`}
+                                  >
+                                    <IconComponent className="h-4 w-4 text-white" />
+                                  </div>
+                                  <span className="text-white text-sm">{category.name}</span>
+                                </div>
+                              </Link>
+                            )
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.nav>
 
       {/* Spacer for fixed navbar */}
-      {isScrolled && <div className="h-[128px]" />}
+      <div className="h-16" />
 
       {/* Cart Sheet */}
       <CartSheet isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
