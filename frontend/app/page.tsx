@@ -6,6 +6,7 @@ import { HeroSection } from "@/components/hero-section"
 import { CategoryIcons } from "@/components/category-icons"
 import { ProductSlider } from "@/components/product-slider"
 import { Footer } from "@/components/footer"
+import {AboutPage} from "@/components/about"
 import { HeroSkeleton, ProductSliderSkeleton, CategoryIconSkeleton } from "@/components/skeleton-loader"
 
 const offersProducts = [
@@ -98,6 +99,28 @@ const recentlyAdded = [
     reviewCount: 380,
     category: "Mobile",
   },
+  {
+    id: "9",
+    name: "Google Play Gift Card - $50",
+    price: 195,
+    originalPrice: 205,
+    image: "/generic-energy-drink-data-card.png",
+    rating: 4.8,
+    reviewCount: 1500,
+    category: "Entertainment",
+    discount: 5,
+  },
+  {
+    id: "10",
+    name: "Spotify Premium Gift Card - $30",
+    price: 195,
+    originalPrice: 205,
+    image: "/generic-energy-drink-data-card.png",
+    rating: 4.8,
+    reviewCount: 1500,
+    category: "Entertainment",
+    discount: 5,
+  },
 ]
 
 export default function HomePage() {
@@ -138,7 +161,7 @@ export default function HomePage() {
           </main>
         </>
       )}
-
+      <AboutPage />
       <Footer />
     </div>
   )
