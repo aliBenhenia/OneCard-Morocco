@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
@@ -16,6 +16,12 @@ import {
   Loader2,
   Lock,
   Star,
+  Zap,
+  Gift,
+  Truck,
+  Globe,
+  Mail,
+  Phone,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,6 +29,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { useCart } from "@/contexts/cart-context"
+import { Badge } from "@/components/ui/badge"
 
 interface PaymentMethod {
   id: string
@@ -30,6 +37,7 @@ interface PaymentMethod {
   icon: React.ReactNode
   description: string
   processingFee?: string
+  popular?: boolean
 }
 
 const paymentMethods: PaymentMethod[] = [
@@ -39,6 +47,7 @@ const paymentMethods: PaymentMethod[] = [
     icon: <CreditCard className="w-5 h-5" />,
     description: "Visa, Mastercard, American Express",
     processingFee: "Free",
+    popular: true
   },
   {
     id: "digital-wallet",
@@ -64,6 +73,7 @@ export default function PaymentPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "success" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState("")
+  const [countdown, setCountdown] = useState(5)
   const [formData, setFormData] = useState({
     cardNumber: "",
     expiryDate: "",
@@ -81,6 +91,17 @@ export default function PaymentPage() {
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const tax = total * 0.08
   const finalTotal = total + tax
+
+  // Countdown timer for success redirect
+  useEffect(() => {
+    if (paymentStatus === "success" && countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+      return () => clearTimeout(timer)
+    } else if (paymentStatus === "success" && countdown === 0) {
+      clearCart()
+      router.push("/")
+    }
+  }, [paymentStatus, countdown])
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -148,19 +169,22 @@ export default function PaymentPage() {
     setIsProcessing(true)
     setPaymentStatus("processing")
 
-    // Simulate payment processing
+    // Simulate payment processing with realistic steps
     try {
-      await new Promise((resolve) => setTimeout(resolve, 3000))
+      // Step 1: Validating payment
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      
+      // Step 2: Processing transaction
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      
+      // Step 3: Finalizing payment
+      await new Promise((resolve) => setTimeout(resolve, 1000))
 
       // Simulate random success/failure for demo
       const success = Math.random() > 0.2 // 80% success rate
 
       if (success) {
         setPaymentStatus("success")
-        setTimeout(() => {
-          clearCart()
-          router.push("/")
-        }, 3000)
       } else {
         throw new Error("Payment declined. Please try a different payment method.")
       }
@@ -174,32 +198,55 @@ export default function PaymentPage() {
 
   if (cartItems.length === 0 && paymentStatus !== "success") {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] flex items-center justify-center">
+        <motion.div 
+          className="text-center p-8 rounded-2xl bg-[#1a1a1a] border border-gray-800 max-w-md w-full mx-4"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Gift className="w-8 h-8 text-white" />
+          </div>
           <h1 className="text-2xl font-bold text-white mb-4">Your cart is empty</h1>
-          <Button onClick={() => router.push("/")} className="bg-blue-600 hover:bg-blue-700">
+          <p className="text-gray-400 mb-6">Add some digital cards to get started with your purchase</p>
+          <Button 
+            onClick={() => router.push("/")} 
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg"
+          >
             Continue Shopping
           </Button>
-        </div>
+        </motion.div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] text-white">
       {/* Header */}
-      <div className="border-b border-gray-800 bg-[#1a1a1a]">
+      <div className="border-b border-gray-800 bg-[#1a1a1a]/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => router.back()} className="text-gray-400 hover:text-white">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">OC</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => router.back()} 
+                className="text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">OC</span>
+                </div>
+                <span className="font-bold text-xl">OneCard</span>
               </div>
-              <span className="font-bold text-xl">OneCard</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <Lock className="w-4 h-4" />
+              <span>Secure Checkout</span>
             </div>
           </div>
         </div>
@@ -209,53 +256,182 @@ export default function PaymentPage() {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Payment Form */}
           <div className="space-y-6">
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <h1 className="text-3xl font-bold mb-2">Complete Your Purchase</h1>
-              <p className="text-gray-400">Secure checkout powered by 256-bit SSL encryption</p>
-            </div>
+              <p className="text-gray-400 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-green-400" />
+                Secure checkout powered by 256-bit SSL encryption
+              </p>
+            </motion.div>
 
             <AnimatePresence mode="wait">
               {paymentStatus === "success" ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-green-900/20 border border-green-500/30 rounded-xl p-8 text-center"
+                  transition={{ duration: 0.5 }}
+                  className="bg-gradient-to-br from-green-900/20 to-emerald-900/20 border border-green-500/30 rounded-2xl p-8 text-center relative overflow-hidden"
                 >
-                  <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Check className="w-8 h-8 text-white" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-green-400 mb-2">Payment Successful!</h2>
-                  <p className="text-gray-300 mb-4">Your digital cards will be delivered to your email shortly.</p>
-                  <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Redirecting to homepage...
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5"></div>
+                  <div className="relative z-10">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 200, 
+                        damping: 10,
+                        delay: 0.2 
+                      }}
+                      className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
+                    >
+                      <Check className="w-10 h-10 text-white" />
+                    </motion.div>
+                    <motion.h2 
+                      className="text-3xl font-bold text-green-400 mb-3"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      Payment Successful!
+                    </motion.h2>
+                    <motion.p 
+                      className="text-gray-300 mb-6 text-lg"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      Your digital cards will be delivered to your email shortly.
+                    </motion.p>
+                    <motion.div 
+                      className="flex items-center justify-center gap-2 text-sm text-gray-400 mb-6"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      <Zap className="w-4 h-4 text-blue-400" />
+                      <span>Redirecting to homepage in {countdown} seconds...</span>
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7 }}
+                    >
+                      <Button 
+                        onClick={() => {
+                          clearCart()
+                          router.push("/")
+                        }}
+                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-lg"
+                      >
+                        Go to Homepage Now
+                      </Button>
+                    </motion.div>
                   </div>
                 </motion.div>
               ) : (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="space-y-6"
+                >
+                  {/* Progress Steps */}
+                  <div className="flex items-center justify-between mb-8">
+                    {[
+                      { label: "Cart", completed: true },
+                      { label: "Payment", completed: false, active: true },
+                      { label: "Confirmation", completed: false }
+                    ].map((step, index) => (
+                      <div key={index} className="flex items-center">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                          step.completed 
+                            ? "bg-green-500 text-white" 
+                            : step.active 
+                              ? "bg-blue-500 text-white" 
+                              : "bg-gray-700 text-gray-400"
+                        }`}>
+                          {step.completed ? <Check className="w-4 h-4" /> : index + 1}
+                        </div>
+                        <span className={`ml-2 text-sm ${
+                          step.completed || step.active ? "text-white" : "text-gray-500"
+                        }`}>
+                          {step.label}
+                        </span>
+                        {index < 2 && (
+                          <div className={`w-12 h-0.5 mx-2 ${
+                            step.completed ? "bg-green-500" : "bg-gray-700"
+                          }`}></div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
                   {/* Payment Methods */}
-                  <div className="bg-[#1a1a1a] rounded-xl p-6 border border-gray-800">
-                    <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
+                  <div className="bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] rounded-2xl p-6 border border-gray-800 shadow-xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-semibold">Payment Method</h2>
+                      <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs">
+                        Secure
+                      </Badge>
+                    </div>
                     <RadioGroup value={selectedMethod} onValueChange={setSelectedMethod}>
                       {paymentMethods.map((method) => (
-                        <div
+                        <motion.div
                           key={method.id}
-                          className="flex items-center space-x-3 p-4 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
+                          className={`flex items-center space-x-4 p-4 rounded-xl border transition-all duration-200 cursor-pointer mb-3 ${
+                            selectedMethod === method.id
+                              ? "border-blue-500 bg-blue-500/5"
+                              : "border-gray-700 hover:border-gray-600 hover:bg-gray-800/30"
+                          }`}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setSelectedMethod(method.id)}
                         >
-                          <RadioGroupItem value={method.id} id={method.id} />
-                          <div className="flex items-center gap-3 flex-1">
-                            <div className="p-2 bg-gray-800 rounded-lg">{method.icon}</div>
+                          <RadioGroupItem 
+                            value={method.id} 
+                            id={method.id} 
+                            className="border-gray-600 text-blue-500"
+                          />
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className={`p-3 rounded-xl ${
+                              selectedMethod === method.id 
+                                ? "bg-blue-500/20" 
+                                : "bg-gray-800"
+                            }`}>
+                              {method.icon}
+                            </div>
                             <div className="flex-1">
-                              <Label htmlFor={method.id} className="font-medium cursor-pointer">
-                                {method.name}
-                              </Label>
+                              <div className="flex items-center gap-2">
+                                <Label 
+                                  htmlFor={method.id} 
+                                  className="font-medium cursor-pointer text-white"
+                                >
+                                  {method.name}
+                                </Label>
+                                {method.popular && (
+                                  <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs">
+                                    Popular
+                                  </Badge>
+                                )}
+                              </div>
                               <p className="text-sm text-gray-400">{method.description}</p>
                             </div>
                             {method.processingFee && (
-                              <span className="text-sm text-green-400">{method.processingFee}</span>
+                              <span className={`text-sm ${
+                                method.processingFee === "Free" 
+                                  ? "text-green-400" 
+                                  : "text-gray-400"
+                              }`}>
+                                {method.processingFee}
+                              </span>
                             )}
                           </div>
-                        </div>
+                        </motion.div>
                       ))}
                     </RadioGroup>
                   </div>
@@ -266,51 +442,60 @@ export default function PaymentPage() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="bg-[#1a1a1a] rounded-xl p-6 border border-gray-800"
+                      transition={{ duration: 0.3 }}
+                      className="bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] rounded-2xl p-6 border border-gray-800 shadow-xl"
                     >
-                      <h3 className="text-lg font-semibold mb-4">Card Information</h3>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <CreditCard className="w-5 h-5 text-blue-400" />
+                        Card Information
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
-                          <Label htmlFor="cardNumber">Card Number</Label>
-                          <Input
-                            id="cardNumber"
-                            placeholder="1234 5678 9012 3456"
-                            value={formData.cardNumber}
-                            onChange={(e) => handleInputChange("cardNumber", formatCardNumber(e.target.value))}
-                            maxLength={19}
-                            className="bg-gray-800 border-gray-700 mt-1"
-                          />
+                          <Label htmlFor="cardNumber" className="text-gray-300">Card Number</Label>
+                          <div className="relative">
+                            <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                            <Input
+                              id="cardNumber"
+                              placeholder="1234 5678 9012 3456"
+                              value={formData.cardNumber}
+                              onChange={(e) => handleInputChange("cardNumber", formatCardNumber(e.target.value))}
+                              maxLength={19}
+                              className="bg-gray-800 border-gray-700 pl-10 mt-1 focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
                         </div>
                         <div>
-                          <Label htmlFor="expiryDate">Expiry Date</Label>
+                          <Label htmlFor="expiryDate" className="text-gray-300">Expiry Date</Label>
                           <Input
                             id="expiryDate"
                             placeholder="MM/YY"
                             value={formData.expiryDate}
                             onChange={(e) => handleInputChange("expiryDate", formatExpiryDate(e.target.value))}
                             maxLength={5}
-                            className="bg-gray-800 border-gray-700 mt-1"
+                            className="bg-gray-800 border-gray-700 mt-1 focus:ring-2 focus:ring-blue-500"
                           />
                         </div>
                         <div>
-                          <Label htmlFor="cvv">CVV</Label>
-                          <Input
-                            id="cvv"
-                            placeholder="123"
-                            value={formData.cvv}
-                            onChange={(e) => handleInputChange("cvv", e.target.value.replace(/\D/g, ""))}
-                            maxLength={4}
-                            className="bg-gray-800 border-gray-700 mt-1"
-                          />
+                          <Label htmlFor="cvv" className="text-gray-300">CVV</Label>
+                          <div className="relative">
+                            <Input
+                              id="cvv"
+                              placeholder="123"
+                              value={formData.cvv}
+                              onChange={(e) => handleInputChange("cvv", e.target.value.replace(/\D/g, ""))}
+                              maxLength={4}
+                              className="bg-gray-800 border-gray-700 mt-1 focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
                         </div>
                         <div className="md:col-span-2">
-                          <Label htmlFor="cardName">Cardholder Name</Label>
+                          <Label htmlFor="cardName" className="text-gray-300">Cardholder Name</Label>
                           <Input
                             id="cardName"
                             placeholder="John Doe"
                             value={formData.cardName}
                             onChange={(e) => handleInputChange("cardName", e.target.value)}
-                            className="bg-gray-800 border-gray-700 mt-1"
+                            className="bg-gray-800 border-gray-700 mt-1 focus:ring-2 focus:ring-blue-500"
                           />
                         </div>
                       </div>
@@ -318,48 +503,54 @@ export default function PaymentPage() {
                   )}
 
                   {/* Billing Information */}
-                  <div className="bg-[#1a1a1a] rounded-xl p-6 border border-gray-800">
-                    <h3 className="text-lg font-semibold mb-4">Billing Information</h3>
+                  <div className="bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] rounded-2xl p-6 border border-gray-800 shadow-xl">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-purple-400" />
+                      Billing Information
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="md:col-span-2">
-                        <Label htmlFor="email">Email Address</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="john@example.com"
-                          value={formData.email}
-                          onChange={(e) => handleInputChange("email", e.target.value)}
-                          className="bg-gray-800 border-gray-700 mt-1"
-                        />
+                        <Label htmlFor="email" className="text-gray-300">Email Address</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                          <Input
+                            id="email"
+                            type="email"
+                            placeholder="john@example.com"
+                            value={formData.email}
+                            onChange={(e) => handleInputChange("email", e.target.value)}
+                            className="bg-gray-800 border-gray-700 pl-10 mt-1 focus:ring-2 focus:ring-purple-500"
+                          />
+                        </div>
                       </div>
                       <div className="md:col-span-2">
-                        <Label htmlFor="billingAddress">Address</Label>
+                        <Label htmlFor="billingAddress" className="text-gray-300">Address</Label>
                         <Input
                           id="billingAddress"
                           placeholder="123 Main Street"
                           value={formData.billingAddress}
                           onChange={(e) => handleInputChange("billingAddress", e.target.value)}
-                          className="bg-gray-800 border-gray-700 mt-1"
+                          className="bg-gray-800 border-gray-700 mt-1 focus:ring-2 focus:ring-purple-500"
                         />
                       </div>
                       <div>
-                        <Label htmlFor="city">City</Label>
+                        <Label htmlFor="city" className="text-gray-300">City</Label>
                         <Input
                           id="city"
                           placeholder="New York"
                           value={formData.city}
                           onChange={(e) => handleInputChange("city", e.target.value)}
-                          className="bg-gray-800 border-gray-700 mt-1"
+                          className="bg-gray-800 border-gray-700 mt-1 focus:ring-2 focus:ring-purple-500"
                         />
                       </div>
                       <div>
-                        <Label htmlFor="zipCode">ZIP Code</Label>
+                        <Label htmlFor="zipCode" className="text-gray-300">ZIP Code</Label>
                         <Input
                           id="zipCode"
                           placeholder="10001"
                           value={formData.zipCode}
                           onChange={(e) => handleInputChange("zipCode", e.target.value)}
-                          className="bg-gray-800 border-gray-700 mt-1"
+                          className="bg-gray-800 border-gray-700 mt-1 focus:ring-2 focus:ring-purple-500"
                         />
                       </div>
                     </div>
@@ -370,7 +561,7 @@ export default function PaymentPage() {
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 flex items-center gap-3"
+                      className="bg-red-900/20 border border-red-500/30 rounded-xl p-4 flex items-center gap-3"
                     >
                       <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
                       <p className="text-red-400">{errorMessage}</p>
@@ -383,86 +574,148 @@ export default function PaymentPage() {
 
           {/* Order Summary */}
           <div className="lg:sticky lg:top-8 h-fit">
-            <div className="bg-[#1a1a1a] rounded-xl p-6 border border-gray-800">
-              <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+            <motion.div 
+              className="bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] rounded-2xl p-6 border border-gray-800 shadow-xl"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Order Summary</h2>
+                <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs">
+                  {cartItems.length} items
+                </Badge>
+              </div>
 
-              <div className="space-y-4 mb-6">
+              <div className="space-y-4 mb-6 max-h-64 overflow-y-auto pr-2">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex items-center gap-3">
+                  <motion.div 
+                    key={item.id} 
+                    className="flex items-center gap-3 p-3 rounded-lg bg-gray-800/30"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     <img
                       src={item.image || "/placeholder.svg"}
                       alt={item.name}
-                      className="w-12 h-12 rounded-lg object-cover"
+                      className="w-12 h-12 rounded-lg object-cover shadow-sm"
                     />
                     <div className="flex-1">
-                      <h3 className="font-medium text-sm">{item.name}</h3>
+                      <h3 className="font-medium text-sm text-white">{item.name}</h3>
                       <p className="text-gray-400 text-xs">Qty: {item.quantity}</p>
+                      <p className="text-gray-500 text-xs">{item.category}</p>
                     </div>
-                    <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
-                  </div>
+                    <span className="font-semibold text-white">${(item.price * item.quantity).toFixed(2)}</span>
+                  </motion.div>
                 ))}
               </div>
 
               <Separator className="bg-gray-700 mb-4" />
 
-              <div className="space-y-2 mb-4">
+              <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Subtotal</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span className="text-white">${total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Tax</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span className="text-gray-400">Tax (8%)</span>
+                  <span className="text-white">${tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Processing Fee</span>
                   <span className="text-green-400">Free</span>
                 </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Delivery</span>
+                  <span className="text-green-400">Instant</span>
+                </div>
               </div>
 
               <Separator className="bg-gray-700 mb-4" />
 
-              <div className="flex justify-between text-lg font-semibold mb-6">
+              <div className="flex justify-between text-xl font-bold mb-6">
                 <span>Total</span>
-                <span>${finalTotal.toFixed(2)}</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
+                  ${finalTotal.toFixed(2)}
+                </span>
               </div>
 
               {paymentStatus !== "success" && (
-                <Button
-                  onClick={handlePayment}
-                  disabled={isProcessing || paymentStatus === "processing"}
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 rounded-lg transition-all duration-200"
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  {paymentStatus === "processing" ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing Payment...
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4 mr-2" />
-                      Complete Payment
-                    </>
-                  )}
-                </Button>
+                  <Button
+                    onClick={handlePayment}
+                    disabled={isProcessing || paymentStatus === "processing"}
+                    className="w-full bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 hover:from-purple-700 hover:via-blue-700 hover:to-cyan-700 text-white font-semibold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    {paymentStatus === "processing" ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        <div className="flex flex-col items-start">
+                          <span>Processing Payment...</span>
+                          <span className="text-xs font-normal opacity-80">Please wait, this may take a moment</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-5 h-5 mr-2" />
+                        Complete Secure Payment
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
               )}
 
               {/* Security Features */}
               <div className="mt-6 pt-4 border-t border-gray-700">
-                <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                  <Shield className="w-4 h-4 text-green-400" />
-                  <span>256-bit SSL encryption</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                  <Star className="w-4 h-4 text-yellow-400" />
-                  <span>PCI DSS compliant</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-400">
-                  <Check className="w-4 h-4 text-green-400" />
-                  <span>30-day money-back guarantee</span>
+                <h4 className="text-sm font-semibold text-gray-300 mb-3">Security Features</h4>
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                      <Shield className="w-4 h-4 text-green-400" />
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">256-bit SSL Encryption</p>
+                      <p className="text-gray-400 text-xs">Bank-level security</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center">
+                      <Star className="w-4 h-4 text-yellow-400" />
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">PCI DSS Compliant</p>
+                      <p className="text-gray-400 text-xs">Industry standard security</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                      <Truck className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">Instant Delivery</p>
+                      <p className="text-gray-400 text-xs">Get your cards immediately</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+
+              {/* Customer Support */}
+              <div className="mt-6 pt-4 border-t border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-400">Need help?</span>
+                  </div>
+                  <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 text-sm p-0 h-auto">
+                    Contact Support
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>
