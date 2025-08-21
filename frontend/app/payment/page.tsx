@@ -22,6 +22,7 @@ import {
   Globe,
   Mail,
   Phone,
+  MapPin,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -30,6 +31,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { useCart } from "@/contexts/cart-context"
 import { Badge } from "@/components/ui/badge"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface PaymentMethod {
   id: string
@@ -65,6 +73,21 @@ const paymentMethods: PaymentMethod[] = [
   },
 ]
 
+const countries = [
+  { code: "MA", name: "Morocco" },
+  { code: "US", name: "United States" },
+  { code: "CA", name: "Canada" },
+  { code: "FR", name: "France" },
+  { code: "DE", name: "Germany" },
+  { code: "GB", name: "United Kingdom" },
+]
+
+const moroccanCities = [
+  "Casablanca", "Rabat", "Fes", "Marrakech", "Tangier", "Agadir", 
+  "Meknes", "Oujda", "Kenitra", "Tetouan", "Safi", "Mohammedia",
+  "Khouribga", "El Jadida", "Taza", "Nador", "Settat", "Larache"
+]
+
 export default function PaymentPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -83,7 +106,7 @@ export default function PaymentPage() {
     billingAddress: "",
     city: "",
     zipCode: "",
-    country: "US",
+    country: "MA",
   })
 
   const cartItems = state.items || []
@@ -155,6 +178,18 @@ export default function PaymentPage() {
     }
     if (!formData.email || !formData.email.includes("@")) {
       setErrorMessage("Please enter a valid email address")
+      return false
+    }
+    if (!formData.billingAddress.trim()) {
+      setErrorMessage("Please enter your billing address")
+      return false
+    }
+    if (!formData.city.trim()) {
+      setErrorMessage("Please enter your city")
+      return false
+    }
+    if (!formData.zipCode.trim()) {
+      setErrorMessage("Please enter your ZIP/Postal code")
       return false
     }
     return true
@@ -253,7 +288,7 @@ export default function PaymentPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-1 xl:grid-cols-2 gap-8">
           {/* Payment Form */}
           <div className="space-y-6">
             <motion.div
@@ -525,29 +560,64 @@ export default function PaymentPage() {
                       </div>
                       <div className="md:col-span-2">
                         <Label htmlFor="billingAddress" className="text-gray-300">Address</Label>
-                        <Input
-                          id="billingAddress"
-                          placeholder="123 Main Street"
-                          value={formData.billingAddress}
-                          onChange={(e) => handleInputChange("billingAddress", e.target.value)}
-                          className="bg-gray-800 border-gray-700 mt-1 focus:ring-2 focus:ring-purple-500"
-                        />
+                        <div className="relative">
+                          <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                          <Input
+                            id="billingAddress"
+                            placeholder="123 Main Street"
+                            value={formData.billingAddress}
+                            onChange={(e) => handleInputChange("billingAddress", e.target.value)}
+                            className="bg-gray-800 border-gray-700 pl-10 mt-1 focus:ring-2 focus:ring-purple-500"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="country" className="text-gray-300">Country</Label>
+                        <Select value={formData.country} onValueChange={(value) => handleInputChange("country", value)}>
+                          <SelectTrigger className="bg-gray-800 border-gray-700 mt-1">
+                            <SelectValue placeholder="Select country" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#2a2a2a] border-gray-700">
+                            {countries.map((country) => (
+                              <SelectItem key={country.code} value={country.code} className="text-white">
+                                {country.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div>
                         <Label htmlFor="city" className="text-gray-300">City</Label>
-                        <Input
-                          id="city"
-                          placeholder="New York"
-                          value={formData.city}
-                          onChange={(e) => handleInputChange("city", e.target.value)}
-                          className="bg-gray-800 border-gray-700 mt-1 focus:ring-2 focus:ring-purple-500"
-                        />
+                        {formData.country === "MA" ? (
+                          <Select value={formData.city} onValueChange={(value) => handleInputChange("city", value)}>
+                            <SelectTrigger className="bg-gray-800 border-gray-700 mt-1">
+                              <SelectValue placeholder="Select city" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#2a2a2a] border-gray-700 max-h-60">
+                              {moroccanCities.map((city) => (
+                                <SelectItem key={city} value={city} className="text-white">
+                                  {city}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Input
+                            id="city"
+                            placeholder="City"
+                            value={formData.city}
+                            onChange={(e) => handleInputChange("city", e.target.value)}
+                            className="bg-gray-800 border-gray-700 mt-1 focus:ring-2 focus:ring-purple-500"
+                          />
+                        )}
                       </div>
                       <div>
-                        <Label htmlFor="zipCode" className="text-gray-300">ZIP Code</Label>
+                        <Label htmlFor="zipCode" className="text-gray-300">
+                          {formData.country === "MA" ? "Postal Code" : "ZIP Code"}
+                        </Label>
                         <Input
                           id="zipCode"
-                          placeholder="10001"
+                          placeholder={formData.country === "MA" ? "20000" : "10001"}
                           value={formData.zipCode}
                           onChange={(e) => handleInputChange("zipCode", e.target.value)}
                           className="bg-gray-800 border-gray-700 mt-1 focus:ring-2 focus:ring-purple-500"
@@ -601,12 +671,12 @@ export default function PaymentPage() {
                       alt={item.name}
                       className="w-12 h-12 rounded-lg object-cover shadow-sm"
                     />
-                    <div className="flex-1">
-                      <h3 className="font-medium text-sm text-white">{item.name}</h3>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-sm text-white truncate">{item.name}</h3>
                       <p className="text-gray-400 text-xs">Qty: {item.quantity}</p>
-                      <p className="text-gray-500 text-xs">{item.category}</p>
+                      <p className="text-gray-500 text-xs truncate">{item.category}</p>
                     </div>
-                    <span className="font-semibold text-white">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="font-semibold text-white whitespace-nowrap">${(item.price * item.quantity).toFixed(2)}</span>
                   </motion.div>
                 ))}
               </div>
@@ -672,9 +742,9 @@ export default function PaymentPage() {
               {/* Security Features */}
               <div className="mt-6 pt-4 border-t border-gray-700">
                 <h4 className="text-sm font-semibold text-gray-300 mb-3">Security Features</h4>
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="flex items-center gap-3 text-sm">
-                    <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0">
                       <Shield className="w-4 h-4 text-green-400" />
                     </div>
                     <div>
@@ -683,7 +753,7 @@ export default function PaymentPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
-                    <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center flex-shrink-0">
                       <Star className="w-4 h-4 text-yellow-400" />
                     </div>
                     <div>
@@ -692,12 +762,21 @@ export default function PaymentPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
-                    <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
                       <Truck className="w-4 h-4 text-blue-400" />
                     </div>
                     <div>
                       <p className="text-white font-medium">Instant Delivery</p>
                       <p className="text-gray-400 text-xs">Get your cards immediately</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Gift className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">100% Satisfaction</p>
+                      <p className="text-gray-400 text-xs">30-day money-back guarantee</p>
                     </div>
                   </div>
                 </div>
