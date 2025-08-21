@@ -29,6 +29,8 @@ import { useCart } from "@/contexts/cart-context"
 import { CartSheet } from "@/components/cart-sheet"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
+// import logo from public/logo.png
+import logo from "@/public/logo.png" // Adjust the path as necessary
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -195,6 +197,7 @@ export function Navbar() {
                 </div>
                 <span className="text-white text-xl font-semibold hidden sm:block">OneCard</span>
               </Link>
+              {/* <img src="https://www.onecard.com/_next/image/?url=%2Fimages%2FGroup%2016909.png&w=256&q=75" alt="OneCard Logo" className="w-8 h-8" /> */}
             </motion.div>
 
             {/* Mobile Menu Button */}
