@@ -1,3 +1,4 @@
+// ```jsx
 "use client"
 
 import { useState, useMemo, useEffect, useCallback } from "react"
@@ -218,7 +219,6 @@ export default function ProductsPage() {
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null)
   const [copied, setCopied] = useState(false)
   const [isClient, setIsClient] = useState(false)
-
   const { addToCart } = useCart()
 
   // Fix hydration error by only running on client
@@ -376,10 +376,10 @@ export default function ProductsPage() {
     
     return (
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-        <DialogContent className="bg-[#2a2a2a] border-gray-700 max-w-md">
+        <DialogContent className="bg-card border-border max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <Share2 className="h-5 w-5 text-blue-400" />
+            <DialogTitle className="text-foreground flex items-center gap-2">
+              <Share2 className="h-5 w-5 text-primary" />
               Share Product
             </DialogTitle>
           </DialogHeader>
@@ -387,24 +387,24 @@ export default function ProductsPage() {
           {currentProduct && (
             <div className="space-y-6">
               {/* Product Preview */}
-              <div className="flex items-center gap-4 p-4 bg-[#1a1a1a] rounded-lg">
+              <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
                 <img 
                   src={currentProduct.image || "/placeholder.svg"} 
                   alt={currentProduct.name}
                   className="w-16 h-16 object-cover rounded-lg"
                 />
                 <div>
-                  <h3 className="text-white font-medium line-clamp-2">{currentProduct.name}</h3>
-                  <p className="text-blue-400 font-semibold">{currentProduct.price} ₽</p>
+                  <h3 className="text-foreground font-medium line-clamp-2">{currentProduct.name}</h3>
+                  <p className="text-primary font-semibold">{currentProduct.price} ₽</p>
                 </div>
               </div>
 
               {/* Share Options */}
               <div className="space-y-4">
-                <div className="flex gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <Button 
                     variant="outline" 
-                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
+                    className="border border-input text-foreground hover:bg-accent hover:text-accent-foreground"
                     onClick={() => shareToSocial('facebook')}
                   >
                     <Facebook className="h-4 w-4 mr-2" />
@@ -412,7 +412,7 @@ export default function ProductsPage() {
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
+                    className="border border-input text-foreground hover:bg-accent hover:text-accent-foreground"
                     onClick={() => shareToSocial('twitter')}
                   >
                     <Twitter className="h-4 w-4 mr-2" />
@@ -420,10 +420,10 @@ export default function ProductsPage() {
                   </Button>
                 </div>
                 
-                <div className="flex gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <Button 
                     variant="outline" 
-                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
+                    className="border border-input text-foreground hover:bg-accent hover:text-accent-foreground"
                     onClick={() => shareToSocial('linkedin')}
                   >
                     <Linkedin className="h-4 w-4 mr-2" />
@@ -431,7 +431,7 @@ export default function ProductsPage() {
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
+                    className="border border-input text-foreground hover:bg-accent hover:text-accent-foreground"
                     onClick={() => shareToSocial('whatsapp')}
                   >
                     <Whatsapp className="h-4 w-4 mr-2" />
@@ -444,11 +444,11 @@ export default function ProductsPage() {
                   <Input
                     value={isClient ? `${window.location.origin}/product/${currentProduct.id}` : ''}
                     readOnly
-                    className="bg-[#1a1a1a] border-gray-600 text-white"
+                    className="bg-muted border-input text-foreground"
                   />
                   <Button 
                     onClick={copyLink}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </Button>
@@ -458,7 +458,7 @@ export default function ProductsPage() {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-green-400 text-sm flex items-center gap-2"
+                    className="text-green-500 text-sm flex items-center gap-2"
                   >
                     <Check className="h-4 w-4" />
                     Link copied to clipboard!
@@ -473,7 +473,7 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] pt-20">
+    <div className="min-h-screen bg-background pt-20">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <motion.div 
@@ -481,24 +481,24 @@ export default function ProductsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2">All Products</h1>
-              <p className="text-gray-400">Discover our complete collection of digital gift cards</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">All Products</h1>
+              <p className="text-muted-foreground">Discover our complete collection of digital gift cards</p>
             </div>
             <div className="text-right">
-              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+              <div className="text-2xl md:text-3xl font-bold text-primary">
                 {filteredAndSortedProducts.length}
               </div>
-              <div className="text-gray-400 text-sm">Products</div>
+              <div className="text-muted-foreground text-sm">Products</div>
             </div>
           </div>
           
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>Home</span>
             <span>/</span>
-            <span className="text-white">Products</span>
+            <span className="text-foreground">Products</span>
           </div>
         </motion.div>
 
@@ -511,9 +511,9 @@ export default function ProductsPage() {
               exit={{ opacity: 0, height: 0 }}
               className="mb-6"
             >
-              <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-xl p-4 border border-blue-500/20">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-white font-medium flex items-center gap-2">
+              <div className="bg-primary/10 rounded-xl p-4 border border-primary/20">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                  <h3 className="text-foreground font-medium flex items-center gap-2">
                     <FilterX className="h-4 w-4" />
                     Active Filters
                   </h3>
@@ -521,7 +521,7 @@ export default function ProductsPage() {
                     variant="ghost"
                     size="sm"
                     onClick={clearFilters}
-                    className="text-blue-400 hover:text-blue-300"
+                    className="text-primary hover:text-primary/80 hover:bg-primary/10"
                   >
                     Clear All
                   </Button>
@@ -534,7 +534,7 @@ export default function ProductsPage() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                     >
-                      <Badge className="bg-blue-600/20 text-blue-300 border border-blue-500/30">
+                      <Badge className="bg-primary/20 text-primary border border-primary/30">
                         {filter}
                       </Badge>
                     </motion.div>
@@ -550,23 +550,23 @@ export default function ProductsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-gradient-to-br from-[#2a2a2a] to-[#3a3a3a] rounded-2xl p-6 mb-8 border border-gray-700 shadow-xl"
+          className="bg-card rounded-2xl p-4 md:p-6 mb-8 border border-border shadow-lg"
         >
           <div className="flex flex-col lg:flex-row gap-4 items-center">
             {/* Search */}
-            <div className="relative flex-1 w-full lg:w-auto">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <div className="relative flex-1 w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search for gift cards, games, entertainment..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-[#1a1a1a] border-gray-600 text-white h-12 focus:ring-2 focus:ring-blue-500"
+                className="pl-10 pr-10 bg-muted border-input text-foreground h-12 focus:ring-2 focus:ring-primary/50"
               />
               {searchQuery && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 text-gray-400 hover:text-white"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
                   onClick={() => setSearchQuery("")}
                 >
                   <X className="h-4 w-4" />
@@ -576,12 +576,12 @@ export default function ProductsPage() {
 
             {/* Category Filter */}
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full lg:w-48 bg-[#1a1a1a] border-gray-600 text-white h-12">
+              <SelectTrigger className="w-full md:w-40 lg:w-48 bg-muted border-input text-foreground h-12">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
-              <SelectContent className="bg-[#2a2a2a] border-gray-600">
+              <SelectContent className="bg-card border-border">
                 {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
+                  <SelectItem key={category} value={category} className="text-foreground">
                     {category}
                   </SelectItem>
                 ))}
@@ -590,12 +590,12 @@ export default function ProductsPage() {
 
             {/* Sort */}
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full lg:w-48 bg-[#1a1a1a] border-gray-600 text-white h-12">
+              <SelectTrigger className="w-full md:w-40 lg:w-48 bg-muted border-input text-foreground h-12">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
-              <SelectContent className="bg-[#2a2a2a] border-gray-600">
+              <SelectContent className="bg-card border-border">
                 {sortOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem key={option.value} value={option.value} className="text-foreground">
                     {option.label}
                   </SelectItem>
                 ))}
@@ -603,12 +603,12 @@ export default function ProductsPage() {
             </Select>
 
             {/* View Mode and Filters Toggle */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full md:w-auto">
               <Button
                 variant={viewMode === "grid" ? "default" : "outline"}
                 size="icon"
                 onClick={() => setViewMode("grid")}
-                className="h-12 w-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="h-12 w-12 bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <Grid className="h-5 w-5" />
               </Button>
@@ -626,14 +626,14 @@ export default function ProductsPage() {
                 className="h-12 px-4"
               >
                 <SlidersHorizontal className="h-5 w-5 mr-2" />
-                Filters
+                <span className="hidden sm:inline">Filters</span>
                 <AnimatePresence>
                   {activeFilters.length > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
-                      className="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                      className="ml-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center"
                     >
                       {activeFilters.length}
                     </motion.span>
@@ -643,19 +643,19 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* Advanced Filters */}
+          {/* Advanced Filters - Responsive */}
           <AnimatePresence>
             {showFilters && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-6 pt-6 border-t border-gray-600"
+                className="mt-6 pt-6 border-t border-border"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                   {/* Price Range */}
                   <div className="space-y-3">
-                    <Label className="text-white font-medium flex items-center gap-2">
+                    <Label className="text-foreground font-medium flex items-center gap-2">
                       <Tag className="h-4 w-4" />
                       Price Range
                     </Label>
@@ -666,7 +666,7 @@ export default function ProductsPage() {
                       step={10} 
                       className="w-full"
                     />
-                    <div className="flex justify-between text-sm text-gray-400">
+                    <div className="flex justify-between text-sm text-muted-foreground">
                       <span>{priceRange[0]} ₽</span>
                       <span>{priceRange[1]} ₽</span>
                     </div>
@@ -674,36 +674,36 @@ export default function ProductsPage() {
 
                   {/* Minimum Rating */}
                   <div className="space-y-3">
-                    <Label className="text-white font-medium flex items-center gap-2">
+                    <Label className="text-foreground font-medium flex items-center gap-2">
                       <Star className="h-4 w-4" />
                       Minimum Rating
                     </Label>
                     <Select value={minRating.toString()} onValueChange={(value) => setMinRating(Number(value))}>
-                      <SelectTrigger className="bg-[#1a1a1a] border-gray-600 text-white">
+                      <SelectTrigger className="bg-muted border-input text-foreground">
                         <SelectValue placeholder="Any Rating" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#2a2a2a] border-gray-600">
-                        <SelectItem value="0">Any Rating</SelectItem>
-                        <SelectItem value="4">4+ Stars</SelectItem>
-                        <SelectItem value="4.5">4.5+ Stars</SelectItem>
-                        <SelectItem value="4.8">4.8+ Stars</SelectItem>
+                      <SelectContent className="bg-card border-border">
+                        <SelectItem value="0" className="text-foreground">Any Rating</SelectItem>
+                        <SelectItem value="4" className="text-foreground">4+ Stars</SelectItem>
+                        <SelectItem value="4.5" className="text-foreground">4.5+ Stars</SelectItem>
+                        <SelectItem value="4.8" className="text-foreground">4.8+ Stars</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Quick Filters */}
-                  <div className="space-y-3 lg:col-span-2">
-                    <Label className="text-white font-medium">Quick Filters</Label>
-                    <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-3 sm:col-span-2 lg:col-span-2">
+                    <Label className="text-foreground font-medium">Quick Filters</Label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex items-center space-x-2">
                         <Checkbox
                           id="discounted"
                           checked={showOnlyDiscounted}
                           onCheckedChange={setShowOnlyDiscounted}
-                          className="border-gray-600 data-[state=checked]:bg-red-500"
+                          className="border-border data-[state=checked]:bg-destructive data-[state=checked]:text-destructive-foreground"
                         />
-                        <Label htmlFor="discounted" className="text-sm text-gray-300 flex items-center gap-1">
-                          <Tag className="h-3 w-3 text-red-400" />
+                        <Label htmlFor="discounted" className="text-sm text-foreground flex items-center gap-1">
+                          <Tag className="h-3 w-3 text-destructive" />
                           On Sale
                         </Label>
                       </div>
@@ -712,10 +712,10 @@ export default function ProductsPage() {
                           id="new"
                           checked={showOnlyNew}
                           onCheckedChange={setShowOnlyNew}
-                          className="border-gray-600 data-[state=checked]:bg-green-500"
+                          className="border-border data-[state=checked]:bg-green-500"
                         />
-                        <Label htmlFor="new" className="text-sm text-gray-300 flex items-center gap-1">
-                          <Clock className="h-3 w-3 text-green-400" />
+                        <Label htmlFor="new" className="text-sm text-foreground flex items-center gap-1">
+                          <Clock className="h-3 w-3 text-green-500" />
                           New Arrivals
                         </Label>
                       </div>
@@ -724,10 +724,10 @@ export default function ProductsPage() {
                           id="popular"
                           checked={showOnlyPopular}
                           onCheckedChange={setShowOnlyPopular}
-                          className="border-gray-600 data-[state=checked]:bg-orange-500"
+                          className="border-border data-[state=checked]:bg-orange-500"
                         />
-                        <Label htmlFor="popular" className="text-sm text-gray-300 flex items-center gap-1">
-                          <TrendingUp className="h-3 w-3 text-orange-400" />
+                        <Label htmlFor="popular" className="text-sm text-foreground flex items-center gap-1">
+                          <TrendingUp className="h-3 w-3 text-orange-500" />
                           Popular
                         </Label>
                       </div>
@@ -736,10 +736,10 @@ export default function ProductsPage() {
                           id="featured"
                           checked={showOnlyFeatured}
                           onCheckedChange={setShowOnlyFeatured}
-                          className="border-gray-600 data-[state=checked]:bg-purple-500"
+                          className="border-border data-[state=checked]:bg-purple-500"
                         />
-                        <Label htmlFor="featured" className="text-sm text-gray-300 flex items-center gap-1">
-                          <Star className="h-3 w-3 text-purple-400" />
+                        <Label htmlFor="featured" className="text-sm text-foreground flex items-center gap-1">
+                          <Star className="h-3 w-3 text-purple-500" />
                           Featured
                         </Label>
                       </div>
@@ -748,11 +748,11 @@ export default function ProductsPage() {
 
                   {/* Results Count */}
                   <div className="space-y-3">
-                    <Label className="text-white font-medium">Results</Label>
-                    <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                    <Label className="text-foreground font-medium">Results</Label>
+                    <div className="text-3xl font-bold text-primary">
                       {isLoading ? "..." : filteredAndSortedProducts.length}
                     </div>
-                    <p className="text-sm text-gray-400">products found</p>
+                    <p className="text-sm text-muted-foreground">products found</p>
                   </div>
                 </div>
               </motion.div>
@@ -770,7 +770,7 @@ export default function ProductsPage() {
             <div
               className={
                 viewMode === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                  ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
                   : "space-y-4"
               }
             >
@@ -792,9 +792,9 @@ export default function ProductsPage() {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-2xl font-bold text-white mb-2">No products found</h3>
-              <p className="text-gray-400 mb-6">Try adjusting your search or filters</p>
-              <Button onClick={clearFilters} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              <h3 className="text-2xl font-bold text-foreground mb-2">No products found</h3>
+              <p className="text-muted-foreground mb-6">Try adjusting your search or filters</p>
+              <Button onClick={clearFilters} className="bg-primary hover:bg-primary/90 text-primary-foreground">
                 Clear All Filters
               </Button>
             </motion.div>
@@ -802,7 +802,7 @@ export default function ProductsPage() {
             <div
               className={
                 viewMode === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                  ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
                   : "space-y-4"
               }
             >
@@ -814,7 +814,7 @@ export default function ProductsPage() {
                   transition={{ delay: index * 0.05 }}
                 >
                   {viewMode === "grid" ? (
-                    <Card className="bg-gradient-to-br from-[#2a2a2a] to-[#3a3a3a] border-gray-700 hover:border-blue-500/50 transition-all duration-300 group overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl">
+                    <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300 group overflow-hidden rounded-2xl shadow-lg hover:shadow-xl">
                       <div className="relative">
                         <motion.img
                           src={product.image || "/placeholder.svg"}
@@ -822,35 +822,35 @@ export default function ProductsPage() {
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                           whileHover={{ scale: 1.05 }}
                         />
-                        <div className="absolute top-3 left-3 flex gap-2">
+                        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
                           {product.isNew && <Badge className="bg-green-500 text-white shadow-lg">New</Badge>}
                           {product.isPopular && <Badge className="bg-orange-500 text-white shadow-lg">Popular</Badge>}
                           {product.isFeatured && <Badge className="bg-purple-500 text-white shadow-lg">Featured</Badge>}
-                          {product.discount && <Badge className="bg-red-500 text-white shadow-lg">-{product.discount}%</Badge>}
+                          {product.discount && <Badge className="bg-destructive text-destructive-foreground shadow-lg">-{product.discount}%</Badge>}
                         </div>
                         <div className="absolute top-3 right-3 flex gap-2">
                           <Button
                             size="icon"
                             variant="secondary"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-black/70 border border-gray-600"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 hover:bg-background border border-border backdrop-blur-sm"
                             onClick={() => toggleWishlist(product.id)}
                           >
                             <Heart 
-                              className={`h-4 w-4 ${wishlist.includes(product.id) ? 'text-red-500 fill-current' : 'text-white'}`} 
+                              className={`h-4 w-4 ${wishlist.includes(product.id) ? 'text-destructive fill-current' : 'text-foreground'}`} 
                             />
                           </Button>
                           <Button
                             size="icon"
                             variant="secondary"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-black/70 border border-gray-600"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 hover:bg-background border border-border backdrop-blur-sm"
                             onClick={() => handleShare(product)}
                           >
-                            <Share2 className="h-4 w-4 text-white" />
+                            <Share2 className="h-4 w-4 text-foreground" />
                           </Button>
                         </div>
                       </div>
                       <CardContent className="p-4">
-                        <h3 className="font-semibold text-white mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
+                        <h3 className="font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                           {product.name}
                         </h3>
                         <div className="flex items-center gap-2 mb-2">
@@ -858,22 +858,22 @@ export default function ProductsPage() {
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'}`}
+                                className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
                               />
                             ))}
-                            <span className="text-sm text-gray-300 ml-1">{product.rating}</span>
+                            <span className="text-sm text-muted-foreground ml-1">{product.rating}</span>
                           </div>
-                          <span className="text-xs text-gray-500">({product.reviews})</span>
+                          <span className="text-xs text-muted-foreground">({product.reviews})</span>
                         </div>
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
-                            <span className="text-xl font-bold text-white">{product.price} ₽</span>
+                            <span className="text-xl font-bold text-foreground">{product.price} ₽</span>
                             {product.originalPrice && (
-                              <span className="text-sm text-gray-500 line-through">{product.originalPrice} ₽</span>
+                              <span className="text-sm text-muted-foreground line-through">{product.originalPrice} ₽</span>
                             )}
                           </div>
                           {product.discount && (
-                            <Badge className="bg-green-500/20 text-green-400 border border-green-500/30">
+                            <Badge className="bg-green-500/20 text-green-600 border border-green-500/30">
                               Save {product.originalPrice && (product.originalPrice - product.price).toFixed(2)} ₽
                             </Badge>
                           )}
@@ -881,7 +881,7 @@ export default function ProductsPage() {
                         <div className="flex gap-2">
                           <Button
                             onClick={() => handleAddToCart(product)}
-                            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
                           >
                             <ShoppingCart className="h-4 w-4 mr-2" />
                             Add to Cart
@@ -889,7 +889,7 @@ export default function ProductsPage() {
                           <Button
                             size="icon"
                             variant="outline"
-                            className="border-gray-600 text-gray-400 hover:text-white hover:border-blue-500"
+                            className="border-border text-muted-foreground hover:text-foreground hover:border-primary"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -897,19 +897,19 @@ export default function ProductsPage() {
                       </CardContent>
                     </Card>
                   ) : (
-                    <Card className="bg-gradient-to-br from-[#2a2a2a] to-[#3a3a3a] border-gray-700 hover:border-blue-500/50 transition-all duration-300 rounded-2xl shadow-lg">
+                    <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300 rounded-2xl shadow-lg">
                       <CardContent className="p-4">
-                        <div className="flex gap-4">
+                        <div className="flex flex-col sm:flex-row gap-4">
                           <motion.img
                             src={product.image || "/placeholder.svg"}
                             alt={product.name}
-                            className="w-24 h-24 object-cover rounded-lg"
+                            className="w-full sm:w-24 h-24 object-cover rounded-lg"
                             whileHover={{ scale: 1.05 }}
                           />
                           <div className="flex-1">
-                            <div className="flex items-start justify-between">
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                               <div>
-                                <h3 className="font-semibold text-white mb-1 group-hover:text-blue-400 transition-colors">
+                                <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
                                   {product.name}
                                 </h3>
                                 <div className="flex items-center gap-2 mb-2">
@@ -917,40 +917,40 @@ export default function ProductsPage() {
                                     {[...Array(5)].map((_, i) => (
                                       <Star
                                         key={i}
-                                        className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'}`}
+                                        className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
                                       />
                                     ))}
-                                    <span className="text-sm text-gray-300 ml-1">{product.rating}</span>
+                                    <span className="text-sm text-muted-foreground ml-1">{product.rating}</span>
                                   </div>
-                                  <span className="text-xs text-gray-500">({product.reviews} reviews)</span>
+                                  <span className="text-xs text-muted-foreground">({product.reviews} reviews)</span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="text-xs border-gray-600">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <Badge variant="outline" className="text-xs border-border text-foreground">
                                     {product.category}
                                   </Badge>
-                                  {product.isNew && <Badge className="bg-green-500/20 text-green-400 border border-green-500/30 text-xs">New</Badge>}
-                                  {product.isPopular && <Badge className="bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs">Popular</Badge>}
-                                  {product.isFeatured && <Badge className="bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xs">Featured</Badge>}
+                                  {product.isNew && <Badge className="bg-green-500/20 text-green-600 border border-green-500/30 text-xs">New</Badge>}
+                                  {product.isPopular && <Badge className="bg-orange-500/20 text-orange-600 border border-orange-500/30 text-xs">Popular</Badge>}
+                                  {product.isFeatured && <Badge className="bg-purple-500/20 text-purple-600 border border-purple-500/30 text-xs">Featured</Badge>}
                                 </div>
                               </div>
                               <div className="text-right">
                                 <div className="flex items-center gap-2 mb-2">
-                                  <span className="text-2xl font-bold text-white">{product.price} ₽</span>
+                                  <span className="text-2xl font-bold text-foreground">{product.price} ₽</span>
                                   {product.originalPrice && (
-                                    <span className="text-sm text-gray-500 line-through">
+                                    <span className="text-sm text-muted-foreground line-through">
                                       {product.originalPrice} ₽
                                     </span>
                                   )}
                                 </div>
                                 {product.discount && (
-                                  <Badge className="bg-green-500/20 text-green-400 border border-green-500/30 mb-2">
+                                  <Badge className="bg-green-500/20 text-green-600 border border-green-500/30 mb-2">
                                     Save {product.originalPrice && (product.originalPrice - product.price).toFixed(2)} ₽
                                   </Badge>
                                 )}
                                 <div className="flex gap-2">
                                   <Button
                                     onClick={() => handleAddToCart(product)}
-                                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
                                   >
                                     <ShoppingCart className="h-4 w-4 mr-2" />
                                     Add to Cart
@@ -958,17 +958,17 @@ export default function ProductsPage() {
                                   <Button
                                     size="icon"
                                     variant="outline"
-                                    className="border-gray-600 text-gray-400 hover:text-white hover:border-blue-500"
+                                    className="border-border text-muted-foreground hover:text-foreground hover:border-primary"
                                     onClick={() => toggleWishlist(product.id)}
                                   >
                                     <Heart 
-                                      className={`h-4 w-4 ${wishlist.includes(product.id) ? 'text-red-500 fill-current' : ''}`} 
+                                      className={`h-4 w-4 ${wishlist.includes(product.id) ? 'text-destructive fill-current' : ''}`} 
                                     />
                                   </Button>
                                   <Button
                                     size="icon"
                                     variant="outline"
-                                    className="border-gray-600 text-gray-400 hover:text-white hover:border-blue-500"
+                                    className="border-border text-muted-foreground hover:text-foreground hover:border-primary"
                                     onClick={() => handleShare(product)}
                                   >
                                     <Share2 className="h-4 w-4" />
@@ -997,7 +997,7 @@ export default function ProductsPage() {
           >
             <Button 
               variant="outline" 
-              className="border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10 px-8 py-3"
+              className="border-border text-foreground hover:text-foreground hover:border-primary hover:bg-accent px-8 py-3"
             >
               Load More Products
             </Button>
@@ -1010,3 +1010,4 @@ export default function ProductsPage() {
     </div>
   )
 }
+// ```
