@@ -217,8 +217,14 @@ export default function ProductsPage() {
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null)
   const [copied, setCopied] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   const { addToCart } = useCart()
+
+  // Fix hydration error by only running on client
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   // Update active filters
   useEffect(() => {
@@ -331,16 +337,16 @@ export default function ProductsPage() {
   }
 
   const copyLink = useCallback(() => {
-    if (currentProduct) {
+    if (currentProduct && isClient) {
       const url = `${window.location.origin}/product/${currentProduct.id}`
       navigator.clipboard.writeText(url)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
-  }, [currentProduct])
+  }, [currentProduct, isClient])
 
   const shareToSocial = (platform: string) => {
-    if (!currentProduct) return
+    if (!currentProduct || !isClient) return
     
     const url = `${window.location.origin}/product/${currentProduct.id}`
     const text = `Check out this amazing ${currentProduct.name} on OneCard!`
@@ -362,6 +368,108 @@ export default function ProductsPage() {
     }
     
     window.open(shareUrl, '_blank')
+  }
+
+  // Only render share dialog on client to prevent hydration errors
+  const renderShareDialog = () => {
+    if (!isClient) return null
+    
+    return (
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent className="bg-[#2a2a2a] border-gray-700 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Share2 className="h-5 w-5 text-blue-400" />
+              Share Product
+            </DialogTitle>
+          </DialogHeader>
+          
+          {currentProduct && (
+            <div className="space-y-6">
+              {/* Product Preview */}
+              <div className="flex items-center gap-4 p-4 bg-[#1a1a1a] rounded-lg">
+                <img 
+                  src={currentProduct.image || "/placeholder.svg"} 
+                  alt={currentProduct.name}
+                  className="w-16 h-16 object-cover rounded-lg"
+                />
+                <div>
+                  <h3 className="text-white font-medium line-clamp-2">{currentProduct.name}</h3>
+                  <p className="text-blue-400 font-semibold">{currentProduct.price} ₽</p>
+                </div>
+              </div>
+
+              {/* Share Options */}
+              <div className="space-y-4">
+                <div className="flex gap-3">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
+                    onClick={() => shareToSocial('facebook')}
+                  >
+                    <Facebook className="h-4 w-4 mr-2" />
+                    Facebook
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
+                    onClick={() => shareToSocial('twitter')}
+                  >
+                    <Twitter className="h-4 w-4 mr-2" />
+                    Twitter
+                  </Button>
+                </div>
+                
+                <div className="flex gap-3">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
+                    onClick={() => shareToSocial('linkedin')}
+                  >
+                    <Linkedin className="h-4 w-4 mr-2" />
+                    LinkedIn
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
+                    onClick={() => shareToSocial('whatsapp')}
+                  >
+                    <Whatsapp className="h-4 w-4 mr-2" />
+                    WhatsApp
+                  </Button>
+                </div>
+
+                {/* Copy Link */}
+                <div className="flex gap-2">
+                  <Input
+                    value={isClient ? `${window.location.origin}/product/${currentProduct.id}` : ''}
+                    readOnly
+                    className="bg-[#1a1a1a] border-gray-600 text-white"
+                  />
+                  <Button 
+                    onClick={copyLink}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  >
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                </div>
+                
+                {copied && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-green-400 text-sm flex items-center gap-2"
+                  >
+                    <Check className="h-4 w-4" />
+                    Link copied to clipboard!
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    )
   }
 
   return (
@@ -897,101 +1005,8 @@ export default function ProductsPage() {
         )}
       </div>
 
-      {/* Share Dialog */}
-      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-        <DialogContent className="bg-[#2a2a2a] border-gray-700 max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <Share2 className="h-5 w-5 text-blue-400" />
-              Share Product
-            </DialogTitle>
-          </DialogHeader>
-          
-          {currentProduct && (
-            <div className="space-y-6">
-              {/* Product Preview */}
-              <div className="flex items-center gap-4 p-4 bg-[#1a1a1a] rounded-lg">
-                <img 
-                  src={currentProduct.image || "/placeholder.svg"} 
-                  alt={currentProduct.name}
-                  className="w-16 h-16 object-cover rounded-lg"
-                />
-                <div>
-                  <h3 className="text-white font-medium line-clamp-2">{currentProduct.name}</h3>
-                  <p className="text-blue-400 font-semibold">{currentProduct.price} ₽</p>
-                </div>
-              </div>
-
-              {/* Share Options */}
-              <div className="space-y-4">
-                <div className="flex gap-3">
-                  <Button 
-                    variant="outline" 
-                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
-                    onClick={() => shareToSocial('facebook')}
-                  >
-                    <Facebook className="h-4 w-4 mr-2" />
-                    Facebook
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
-                    onClick={() => shareToSocial('twitter')}
-                  >
-                    <Twitter className="h-4 w-4 mr-2" />
-                    Twitter
-                  </Button>
-                </div>
-                
-                <div className="flex gap-3">
-                  <Button 
-                    variant="outline" 
-                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
-                    onClick={() => shareToSocial('linkedin')}
-                  >
-                    <Linkedin className="h-4 w-4 mr-2" />
-                    LinkedIn
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="flex-1 border-gray-600 text-gray-300 hover:text-white hover:border-blue-500 hover:bg-blue-500/10"
-                    onClick={() => shareToSocial('whatsapp')}
-                  >
-                    <Whatsapp className="h-4 w-4 mr-2" />
-                    WhatsApp
-                  </Button>
-                </div>
-
-                {/* Copy Link */}
-                <div className="flex gap-2">
-                  <Input
-                    value={`${window.location.origin}/product/${currentProduct.id}`}
-                    readOnly
-                    className="bg-[#1a1a1a] border-gray-600 text-white"
-                  />
-                  <Button 
-                    onClick={copyLink}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                  >
-                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                </div>
-                
-                {copied && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-green-400 text-sm flex items-center gap-2"
-                  >
-                    <Check className="h-4 w-4" />
-                    Link copied to clipboard!
-                  </motion.div>
-                )}
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Share Dialog - Only rendered on client */}
+      {renderShareDialog()}
     </div>
   )
 }
