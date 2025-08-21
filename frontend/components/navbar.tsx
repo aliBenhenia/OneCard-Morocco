@@ -21,6 +21,21 @@ import {
   X,
   Filter,
   Menu,
+  Phone,
+  Mail,
+  MapPin,
+  Heart,
+  Bell,
+  Settings,
+  LogOut,
+  ChevronRight,
+  Wallet,
+  Truck,
+  Shield,
+  Award,
+  Headphones,
+  Grid3X3,
+  List,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,8 +44,6 @@ import { useCart } from "@/contexts/cart-context"
 import { CartSheet } from "@/components/cart-sheet"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-// import logo from public/logo.png
-import logo from "@/public/logo.png" // Adjust the path as necessary
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -42,8 +55,13 @@ export function Navbar() {
   const [searchResults, setSearchResults] = useState([])
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState("home")
   const searchRef = useRef(null)
   const dropdownRef = useRef(null)
+  const userMenuRef = useRef(null)
+  const megaMenuRef = useRef(null)
   const { state } = useCart()
 
   // Handle scroll behavior
@@ -75,6 +93,12 @@ export function Navbar() {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false)
       }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false)
+      }
+      if (megaMenuRef.current && !megaMenuRef.current.contains(event.target)) {
+        setIsMegaMenuOpen(false)
+      }
     }
 
     document.addEventListener("mousedown", handleClickOutside)
@@ -90,6 +114,9 @@ export function Navbar() {
         { id: 3, name: "Amazon Gift Card $50", category: "Shopping", price: 50.00 },
         { id: 4, name: "PlayStation Plus 3 Months", category: "Gaming Cards", price: 29.99 },
         { id: 5, name: "Spotify Premium 6 Months", category: "Entertainment", price: 35.99 },
+        { id: 6, name: "Google Play $25", category: "Mobile", price: 24.99 },
+        { id: 7, name: "Xbox Live Gold 1 Month", category: "Gaming", price: 9.99 },
+        { id: 8, name: "Disney+ Annual", category: "Entertainment", price: 79.99 },
       ].filter(item => 
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.category.toLowerCase().includes(searchQuery.toLowerCase())
@@ -109,6 +136,7 @@ export function Navbar() {
       description: "Steam, PlayStation, Xbox & more",
       color: "from-purple-500 to-pink-500",
       count: 45,
+      popular: true,
     },
     {
       name: "Mobile Recharge",
@@ -123,6 +151,7 @@ export function Navbar() {
       description: "Netflix, Spotify, YouTube Premium",
       color: "from-red-500 to-orange-500",
       count: 28,
+      popular: true,
     },
     {
       name: "Shopping",
@@ -161,11 +190,114 @@ export function Navbar() {
     { name: "Pay Bills", icon: CreditCard, href: "/pay-bills" },
   ]
 
+  const userMenuItems = [
+    { name: "My Account", icon: User, href: "/account" },
+    { name: "My Orders", icon: Package, href: "/orders" },
+    { name: "Wishlist", icon: Heart, href: "/wishlist" },
+    { name: "Notifications", icon: Bell, href: "/notifications" },
+    { name: "Settings", icon: Settings, href: "/settings" },
+    { name: "Logout", icon: LogOut, href: "/logout" },
+  ]
+
+  const megaMenuCategories = [
+    {
+      title: "Gaming",
+      items: [
+        { name: "Steam Wallet", href: "/gaming/steam" },
+        { name: "PlayStation Network", href: "/gaming/psn" },
+        { name: "Xbox Live", href: "/gaming/xbox" },
+        { name: "Nintendo eShop", href: "/gaming/nintendo" },
+        { name: "Game Currency", href: "/gaming/currency" },
+      ],
+      icon: Gamepad2,
+      color: "text-purple-400",
+    },
+    {
+      title: "Entertainment",
+      items: [
+        { name: "Netflix", href: "/entertainment/netflix" },
+        { name: "Disney+", href: "/entertainment/disney" },
+        { name: "Spotify", href: "/entertainment/spotify" },
+        { name: "Apple TV+", href: "/entertainment/apple-tv" },
+        { name: "HBO Max", href: "/entertainment/hbo" },
+      ],
+      icon: Music,
+      color: "text-red-400",
+    },
+    {
+      title: "Shopping",
+      items: [
+        { name: "Amazon", href: "/shopping/amazon" },
+        { name: "eBay", href: "/shopping/ebay" },
+        { name: "Walmart", href: "/shopping/walmart" },
+        { name: "Target", href: "/shopping/target" },
+        { name: "Best Buy", href: "/shopping/best-buy" },
+      ],
+      icon: ShoppingBag,
+      color: "text-blue-400",
+    },
+    {
+      title: "Mobile",
+      items: [
+        { name: "Google Play", href: "/mobile/google-play" },
+        { name: "App Store", href: "/mobile/app-store" },
+        { name: "Mobile Recharge", href: "/mobile/recharge" },
+        { name: "Data Plans", href: "/mobile/data" },
+        { name: "Prepaid Cards", href: "/mobile/prepaid" },
+      ],
+      icon: Smartphone,
+      color: "text-green-400",
+    },
+  ]
+
+  const supportItems = [
+    { name: "24/7 Support", icon: Headphones, description: "Always here to help" },
+    { name: "Secure Payments", icon: Shield, description: "Bank-level encryption" },
+    { name: "Fast Delivery", icon: Truck, description: "Instant digital delivery" },
+    { name: "Money Back", icon: Award, description: "30-day guarantee" },
+  ]
+
+  const bottomNavItems = [
+    { name: "Home", icon: Home, href: "/" },
+    { name: "Categories", icon: Grid3X3, href: "/categories" },
+    { name: "Search", icon: Search, href: "/search" },
+    { name: "Cart", icon: ShoppingCart, href: "/cart" },
+    { name: "Account", icon: User, href: "/account" },
+  ]
+
   // Calculate navbar transform based on scroll
   const navbarTransform = isScrolled ? Math.max(-100, -scrollPosition / 2) : 0
 
   return (
     <>
+      {/* Top Bar - Contact Info (Hidden on mobile) */}
+      <div className="hidden md:block bg-gradient-to-r from-purple-900/20 to-blue-900/20 border-b border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between text-sm">
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center text-gray-300 hover:text-white transition-colors">
+              <Phone className="h-4 w-4 mr-2" />
+              <span>+1 (555) 123-4567</span>
+            </div>
+            <div className="flex items-center text-gray-300 hover:text-white transition-colors">
+              <Mail className="h-4 w-4 mr-2" />
+              <span>support@onecard.com</span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center text-gray-300">
+              <MapPin className="h-4 w-4 mr-2" />
+              <span>San Francisco, CA</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <img src="/visa.png" alt="Visa" className="h-4 opacity-70" />
+              <img src="/mastercard.png" alt="Mastercard" className="h-4 opacity-70" />
+              <img src="/paypal.png" alt="PayPal" className="h-4 opacity-70" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation */}
       <motion.nav
         className={`fixed top-0 left-0 right-0 z-50 bg-[#1a1a1a] border-b border-gray-700 transition-all duration-300 ${
           isScrolled ? "shadow-2xl backdrop-blur-md bg-[#1a1a1a]/95" : ""
@@ -182,8 +314,7 @@ export function Navbar() {
           duration: 0.3 
         }}
       >
-        {/* Top Bar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <motion.div 
@@ -192,26 +323,18 @@ export function Navbar() {
               transition={{ duration: 0.2 }}
             >
               <Link href="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-sm">OC</span>
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-lg">OC</span>
                 </div>
-                <span className="text-white text-xl font-semibold hidden sm:block">OneCard</span>
+                <div className="hidden sm:block">
+                  <span className="text-white text-xl font-bold">OneCard</span>
+                  <div className="text-xs text-gray-400 -mt-1">Digital Marketplace</div>
+                </div>
               </Link>
-              {/* <img src="https://www.onecard.com/_next/image/?url=%2Fimages%2FGroup%2016909.png&w=256&q=75" alt="OneCard Logo" className="w-8 h-8" /> */}
             </motion.div>
 
-            {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="md:hidden text-white hover:bg-gray-700/50 p-2"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-
-            {/* Search Bar - Hidden on mobile */}
-            <div className="hidden md:flex flex-1 max-w-2xl mx-8 relative" ref={searchRef}>
+            {/* Search Bar - Responsive */}
+            <div className="flex-1 max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl mx-2 md:mx-4 relative" ref={searchRef}>
               <motion.div 
                 className="relative" 
                 whileFocus={{ scale: 1.02 }} 
@@ -220,11 +343,11 @@ export function Navbar() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
                 <Input
                   type="text"
-                  placeholder="Search gift cards, games, entertainment..."
+                  placeholder="Search gift cards, games..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => searchQuery && setShowSearchResults(true)}
-                  className="w-full pl-10 pr-10 py-2 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent rounded-lg shadow-inner"
+                  className="w-full pl-10 pr-10 py-2 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent rounded-lg shadow-inner text-sm"
                 />
                 {searchQuery && (
                   <Button
@@ -246,16 +369,16 @@ export function Navbar() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full left-0 right-0 mt-2 bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-600 rounded-xl shadow-2xl z-50 overflow-hidden"
+                    className="absolute top-full left-0 right-0 mt-1 bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-600 rounded-xl shadow-2xl z-50 overflow-hidden"
                   >
-                    <div className="p-3 border-b border-gray-600 bg-gradient-to-r from-blue-600/10 to-purple-600/10">
+                    <div className="p-2 border-b border-gray-600 bg-gradient-to-r from-blue-600/10 to-purple-600/10">
                       <div className="flex items-center justify-between">
                         <h3 className="text-white font-medium text-sm">Search Results</h3>
                         <span className="text-gray-400 text-xs">{searchResults.length} items</span>
                       </div>
                     </div>
 
-                    <div className="max-h-80 overflow-y-auto">
+                    <div className="max-h-60 overflow-y-auto">
                       {searchResults.map((item, index) => (
                         <motion.div
                           key={item.id}
@@ -272,7 +395,7 @@ export function Navbar() {
                           >
                             <motion.div
                               whileHover={{ backgroundColor: "rgba(55, 65, 81, 0.5)" }}
-                              className="p-3 border-b border-gray-700/50 last:border-b-0 cursor-pointer"
+                              className="p-2 border-b border-gray-700/50 last:border-b-0 cursor-pointer"
                             >
                               <div className="flex items-center justify-between">
                                 <div>
@@ -280,13 +403,26 @@ export function Navbar() {
                                   <p className="text-gray-400 text-xs mt-1">{item.category}</p>
                                 </div>
                                 <div className="text-right">
-                                  <p className="text-white font-semibold text-sm">${item.price}</p>
+                                  <p className="text-white font-semibold text-sm">${item.price.toFixed(2)}</p>
                                 </div>
                               </div>
                             </motion.div>
                           </Link>
                         </motion.div>
                       ))}
+                    </div>
+                    
+                    <div className="p-2 border-t border-gray-600 bg-gradient-to-r from-gray-800 to-gray-900">
+                      <Link 
+                        href={`/search?q=${searchQuery}`}
+                        onClick={() => {
+                          setShowSearchResults(false)
+                          setSearchQuery("")
+                        }}
+                        className="text-blue-400 hover:text-blue-300 text-sm flex items-center justify-center"
+                      >
+                        View all results
+                      </Link>
                     </div>
                   </motion.div>
                 )}
@@ -300,27 +436,174 @@ export function Navbar() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full left-0 right-0 mt-2 bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-600 rounded-xl shadow-2xl z-50 p-6 text-center"
+                    className="absolute top-full left-0 right-0 mt-1 bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-600 rounded-xl shadow-2xl z-50 p-4 text-center"
                   >
-                    <Filter className="h-8 w-8 text-gray-500 mx-auto mb-2" />
-                    <p className="text-gray-400 text-sm">No results found for "{searchQuery}"</p>
-                    <p className="text-gray-500 text-xs mt-1">Try different keywords or browse categories</p>
+                    <Filter className="h-6 w-6 text-gray-500 mx-auto mb-1" />
+                    <p className="text-gray-400 text-sm">No results found</p>
+                    <p className="text-gray-500 text-xs mt-1">Try different keywords</p>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            {/* User Actions */}
-            <div className="flex items-center space-x-2">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden sm:block">
-                <Link href="/login">
-                  <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-lg px-3 py-2 text-sm">
-                    <User className="h-4 w-4 mr-2" />
-                    Login
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-1">
+              {/* Categories Mega Menu */}
+              <div className="relative" ref={megaMenuRef}>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-3 py-2 rounded-lg flex items-center shadow-lg transition-all duration-200 text-sm"
+                    onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
+                  >
+                    <span className="mr-1 text-lg">≡</span>
+                    <span>Categories</span>
+                    <ChevronDown
+                      className={`ml-1 h-4 w-4 transition-transform duration-200 ${isMegaMenuOpen ? "rotate-180" : ""}`}
+                    />
                   </Button>
-                </Link>
-              </motion.div>
+                </motion.div>
 
+                <AnimatePresence>
+                  {isMegaMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-0 mt-1 w-[800px] bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-600 rounded-xl shadow-2xl z-50 overflow-hidden"
+                    >
+                      <div className="grid grid-cols-4 gap-4 p-4">
+                        {megaMenuCategories.map((category, index) => {
+                          const IconComponent = category.icon
+                          return (
+                            <div key={category.title} className="space-y-2">
+                              <div className="flex items-center space-x-2">
+                                <IconComponent className={`h-4 w-4 ${category.color}`} />
+                                <h3 className="text-white font-semibold text-sm">{category.title}</h3>
+                              </div>
+                              <ul className="space-y-1">
+                                {category.items.map((item) => (
+                                  <li key={item.name}>
+                                    <Link 
+                                      href={item.href} 
+                                      onClick={() => setIsMegaMenuOpen(false)}
+                                      className="text-gray-400 hover:text-white text-xs flex items-center justify-between group"
+                                    >
+                                      <span className="group-hover:translate-x-1 transition-transform">{item.name}</span>
+                                      <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )
+                        })}
+                      </div>
+                      
+                      <div className="border-t border-gray-700 p-3 bg-gradient-to-r from-gray-800 to-gray-900">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                          {supportItems.map((item, index) => {
+                            const IconComponent = item.icon
+                            return (
+                              <div key={index} className="flex items-center space-x-1">
+                                <div className="p-1 bg-gray-700 rounded">
+                                  <IconComponent className="h-3 w-3 text-blue-400" />
+                                </div>
+                                <div>
+                                  <div className="text-white text-xs font-medium">{item.name}</div>
+                                  <div className="text-gray-400 text-[10px]">{item.description}</div>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Quick Links */}
+              {quickLinks.map((link) => {
+                const IconComponent = link.icon
+                return (
+                  <motion.div 
+                    key={link.name}
+                    whileHover={{ scale: 1.05 }} 
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Link href={link.href}>
+                      <Button
+                        variant="ghost"
+                        className="text-gray-300 hover:text-white hover:bg-gray-700/50 px-2 py-2 rounded-lg flex items-center transition-all duration-200 text-sm"
+                      >
+                        <IconComponent className="h-4 w-4" />
+                        <span className="ml-2 hidden xl:inline">{link.name}</span>
+                      </Button>
+                    </Link>
+                  </motion.div>
+                )
+              })}
+            </div>
+
+            {/* User Actions */}
+            <div className="flex items-center space-x-1">
+              {/* User Menu */}
+              <div className="relative" ref={userMenuRef}>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    variant="ghost"
+                    className="text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-lg p-2"
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  >
+                    <User className="h-5 w-5" />
+                  </Button>
+                </motion.div>
+
+                <AnimatePresence>
+                  {isUserMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full right-0 mt-1 w-56 bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-600 rounded-xl shadow-2xl z-50 overflow-hidden"
+                    >
+                      <div className="p-3 border-b border-gray-600 bg-gradient-to-r from-blue-600/10 to-purple-600/10">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                            <User className="h-4 w-4 text-white" />
+                          </div>
+                          <div>
+                            <div className="text-white font-medium text-sm">John Doe</div>
+                            <div className="text-gray-400 text-xs">john@example.com</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="py-1">
+                        {userMenuItems.map((item) => {
+                          const IconComponent = item.icon
+                          return (
+                            <Link 
+                              key={item.name} 
+                              href={item.href}
+                              onClick={() => setIsUserMenuOpen(false)}
+                            >
+                              <div className="flex items-center space-x-2 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700/50 cursor-pointer">
+                                <IconComponent className="h-4 w-4" />
+                                <span className="text-sm">{item.name}</span>
+                              </div>
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Cart */}
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <Button
                   variant="ghost"
@@ -345,126 +628,16 @@ export function Navbar() {
                   </AnimatePresence>
                 </Button>
               </motion.div>
-            </div>
-          </div>
 
-          {/* Navigation Bar - Desktop */}
-          <div className="hidden md:block border-t border-gray-700 py-3">
-            <div className="flex items-center space-x-4">
-              {/* Categories Dropdown */}
-              <div className="relative" ref={dropdownRef}>
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg flex items-center shadow-lg transition-all duration-200"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  >
-                    <span className="mr-2 text-lg">≡</span>
-                    <span className="hidden lg:inline">Shopping Categories</span>
-                    <span className="lg:hidden">Categories</span>
-                    <ChevronDown
-                      className={`ml-2 h-4 w-4 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
-                    />
-                  </Button>
-                </motion.div>
-
-                <AnimatePresence>
-                  {isDropdownOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute top-full left-0 mt-2 w-80 bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-600 rounded-xl shadow-2xl z-50 overflow-hidden"
-                    >
-                      <div className="p-4 border-b border-gray-600 bg-gradient-to-r from-blue-600/10 to-purple-600/10">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-white font-semibold">Browse Categories</h3>
-                          <Link href="/products" onClick={() => setIsDropdownOpen(false)}>
-                            <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 text-xs">
-                              View All
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
-
-                      <div className="max-h-96 overflow-y-auto">
-                        {categories.map((category, index) => {
-                          const IconComponent = category.icon
-                          return (
-                            <motion.div
-                              key={category.name}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.05 }}
-                            >
-                              <Link href="/products" onClick={() => setIsDropdownOpen(false)}>
-                                <motion.button
-                                  whileHover={{ backgroundColor: "rgba(55, 65, 81, 0.5)", x: 4 }}
-                                  className="w-full text-left p-4 border-b border-gray-700/50 last:border-b-0 transition-all duration-200"
-                                >
-                                  <div className="flex items-center space-x-3">
-                                    <div
-                                      className={`w-10 h-10 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center shadow-lg`}
-                                    >
-                                      <IconComponent className="h-5 w-5 text-white" />
-                                    </div>
-                                    <div className="flex-1">
-                                      <div className="flex items-center justify-between">
-                                        <h4 className="text-white font-medium text-sm">{category.name}</h4>
-                                        <div className="flex items-center space-x-1">
-                                          <Badge variant="secondary" className="text-xs bg-gray-700 text-gray-300">
-                                            {category.count}
-                                          </Badge>
-                                          {category.count > 30 && (
-                                            <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                                          )}
-                                        </div>
-                                      </div>
-                                      <p className="text-gray-400 text-xs mt-1">{category.description}</p>
-                                    </div>
-                                  </div>
-                                </motion.button>
-                              </Link>
-                            </motion.div>
-                          )
-                        })}
-                      </div>
-
-                      <div className="p-4 bg-gradient-to-r from-gray-800 to-gray-900 border-t border-gray-600">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-gray-400">Popular this week</span>
-                          <div className="flex space-x-2">
-                            <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">Gaming</Badge>
-                            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">Shopping</Badge>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Quick Links */}
-              {quickLinks.map((link) => {
-                const IconComponent = link.icon
-                return (
-                  <motion.div 
-                    key={link.name}
-                    whileHover={{ scale: 1.05 }} 
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Link href={link.href}>
-                      <Button
-                        variant="ghost"
-                        className="text-gray-300 hover:text-white hover:bg-gray-700/50 px-3 py-2 rounded-lg flex items-center transition-all duration-200 text-sm"
-                      >
-                        <IconComponent className="mr-2 h-4 w-4" />
-                        <span className="hidden lg:inline">{link.name}</span>
-                      </Button>
-                    </Link>
-                  </motion.div>
-                )
-              })}
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="lg:hidden text-white hover:bg-gray-700/50 p-2"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
             </div>
           </div>
 
@@ -476,89 +649,54 @@ export function Navbar() {
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3 }}
-                className="md:hidden border-t border-gray-700 py-3 overflow-hidden"
+                className="lg:hidden border-t border-gray-700 py-3 overflow-hidden"
               >
-                <div className="space-y-2">
-                  {/* Mobile Search */}
-                  <div className="relative mb-3" ref={searchRef}>
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      type="text"
-                      placeholder="Search..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onFocus={() => searchQuery && setShowSearchResults(true)}
-                      className="w-full pl-10 pr-4 py-2 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 rounded-lg"
-                    />
+                <div className="space-y-3">
+                  {/* Mobile Categories */}
+                  <div className="space-y-2">
+                    <div className="px-2 py-1 text-gray-400 text-sm font-medium">Categories</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {categories.slice(0, 6).map((category) => {
+                        const IconComponent = category.icon
+                        return (
+                          <Link 
+                            key={category.name} 
+                            href="/products" 
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-gray-700/50"
+                          >
+                            <div
+                              className={`w-10 h-10 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center`}
+                            >
+                              <IconComponent className="h-5 w-5 text-white" />
+                            </div>
+                            <span className="text-white text-xs text-center">{category.name}</span>
+                          </Link>
+                        )
+                      })}
+                    </div>
                   </div>
 
                   {/* Mobile Quick Links */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {quickLinks.map((link) => {
-                      const IconComponent = link.icon
-                      return (
-                        <Link key={link.name} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>
-                          <Button
-                            variant="ghost"
-                            className="w-full text-gray-300 hover:text-white hover:bg-gray-700/50 px-3 py-2 rounded-lg flex items-center transition-all duration-200 text-sm"
+                  <div className="space-y-2">
+                    <div className="px-2 py-1 text-gray-400 text-sm font-medium">Quick Links</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {quickLinks.map((link) => {
+                        const IconComponent = link.icon
+                        return (
+                          <Link 
+                            key={link.name} 
+                            href={link.href} 
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center space-x-2 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-lg"
                           >
-                            <IconComponent className="mr-2 h-4 w-4" />
-                            {link.name}
-                          </Button>
-                        </Link>
-                      )
-                    })}
+                            <IconComponent className="h-4 w-4" />
+                            <span className="text-sm">{link.name}</span>
+                          </Link>
+                        )
+                      })}
+                    </div>
                   </div>
-
-                  {/* Mobile Categories Button */}
-                  <Button
-                    variant="outline"
-                    className="w-full text-left justify-between bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  >
-                    <span>Browse Categories</span>
-                    <ChevronDown
-                      className={`h-4 w-4 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
-                    />
-                  </Button>
-
-                  {/* Mobile Categories Dropdown */}
-                  <AnimatePresence>
-                    {isDropdownOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="grid grid-cols-2 gap-2 mt-2 pl-2">
-                          {categories.slice(0, 6).map((category) => {
-                            const IconComponent = category.icon
-                            return (
-                              <Link 
-                                key={category.name} 
-                                href="/products" 
-                                onClick={() => {
-                                  setIsDropdownOpen(false)
-                                  setIsMobileMenuOpen(false)
-                                }}
-                              >
-                                <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-700/50">
-                                  <div
-                                    className={`w-8 h-8 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center`}
-                                  >
-                                    <IconComponent className="h-4 w-4 text-white" />
-                                  </div>
-                                  <span className="text-white text-sm">{category.name}</span>
-                                </div>
-                              </Link>
-                            )
-                          })}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               </motion.div>
             )}
@@ -566,8 +704,26 @@ export function Navbar() {
         </div>
       </motion.nav>
 
+      {/* Bottom Navigation for Mobile */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-gray-700 z-50">
+        <div className="grid grid-cols-5">
+          {bottomNavItems.map((item) => {
+            const IconComponent = item.icon
+            return (
+              <Link key={item.name} href={item.href}>
+                <div className="flex flex-col items-center justify-center py-2 text-gray-400 hover:text-white transition-colors">
+                  <IconComponent className="h-5 w-5" />
+                  <span className="text-xs mt-1">{item.name}</span>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      </div>
+
       {/* Spacer for fixed navbar */}
-      <div className="h-16" />
+      <div className="h-16 md:h-16" />
+      <div className="lg:hidden h-16" />
 
       {/* Cart Sheet */}
       <CartSheet isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
