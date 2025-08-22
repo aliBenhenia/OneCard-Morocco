@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Eye, EyeOff, ShoppingCart } from "lucide-react"
 import api from "@/api"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -17,6 +18,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
+  const { dispatch } = useAuth()
+
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -32,6 +35,7 @@ export default function LoginPage() {
       if (response.data.success) {
         // Store token in localStorage or context (if available)
         localStorage.setItem('token', response.data.token);
+        dispatch({ type: "LOGIN" });
         router.push("/")
       }
     } catch (err) {

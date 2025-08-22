@@ -5,6 +5,7 @@ import { Manrope } from "next/font/google"
 import "./globals.css"
 import { CartProvider } from "@/contexts/cart-context"
 import { ThemeProvider } from "@/components/theme-provider"
+import { AuthProvider } from "@/contexts/AuthContext"
 import { Navbar } from "@/components/navbar"
 
 const geist = Geist({
@@ -36,9 +37,11 @@ export default function RootLayout({
       <body className="font-sans">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <CartProvider>
-            <Navbar />
-            {children}
-            </CartProvider>
+            <AuthProvider>
+              <Navbar />
+              {children}
+            </AuthProvider>
+          </CartProvider>
         </ThemeProvider>
       </body>
     </html>

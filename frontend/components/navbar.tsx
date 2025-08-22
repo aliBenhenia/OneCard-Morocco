@@ -44,6 +44,9 @@ import { useCart } from "@/contexts/cart-context"
 import { CartSheet } from "@/components/cart-sheet"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
+import api from "@/api"
+import axios from "axios"
+import { useAuth } from "@/contexts/AuthContext"
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -58,11 +61,44 @@ export function Navbar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("home")
+  const [userProfile, setUserProfile] = useState(null)
+  const [loadingProfile, setLoadingProfile] = useState(true)
   const searchRef = useRef(null)
   const dropdownRef = useRef(null)
   const userMenuRef = useRef(null)
   const megaMenuRef = useRef(null)
-  const { state } = useCart()
+  const { state } = useCart();
+  const { state: authState } = useAuth();
+
+  // Check for token and fetch profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        // Check if token exists (you might need to adjust this based on your auth setup)
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+        
+        if (token) {
+          const response = await api.get("/api/auth/profile", {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })  
+          if (response.data.success) {
+            setUserProfile(response.data.user)
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error)
+        // Clear token if invalid
+        localStorage.removeItem('token')
+        sessionStorage.removeItem('token')
+      } finally {
+        setLoadingProfile(false)
+      }
+    }
+
+    fetchUserProfile()
+  }, [authState])
 
   // Handle scroll behavior
   useEffect(() => {
@@ -191,12 +227,12 @@ export function Navbar() {
   ]
 
   const userMenuItems = [
-    { name: "My Account", icon: User, href: "/account" },
-    { name: "My Orders", icon: Package, href: "/orders" },
-    { name: "Wishlist", icon: Heart, href: "/wishlist" },
-    { name: "Notifications", icon: Bell, href: "/notifications" },
-    { name: "Settings", icon: Settings, href: "/settings" },
-    { name: "Logout", icon: LogOut, href: "/logout" },
+    { name: "My Account", icon: User, href: "/" },
+    { name: "My Orders", icon: Package, href: "/" },
+    { name: "Wishlist", icon: Heart, href: "/" },
+    { name: "Notifications", icon: Bell, href: "/" },
+    { name: "Settings", icon: Settings, href: "/" },
+    { name: "Logout", icon: LogOut, href: "/" },
   ]
 
   const megaMenuCategories = [
@@ -267,6 +303,14 @@ export function Navbar() {
 
   // Calculate navbar transform based on scroll
   const navbarTransform = isScrolled ? Math.max(-100, -scrollPosition / 2) : 0
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    sessionStorage.removeItem('token')
+    setUserProfile(null)
+    setIsUserMenuOpen(false)
+  }
 
   return (
     <>
@@ -550,18 +594,30 @@ export function Navbar() {
             <div className="flex items-center space-x-1">
               {/* User Menu */}
               <div className="relative" ref={userMenuRef}>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    variant="ghost"
-                    className="text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-lg p-2"
-                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  >
-                    <User className="h-5 w-5" />
-                  </Button>
-                </motion.div>
+                {loadingProfile ? (
+                  <div className="w-8 h-8 rounded-full bg-gray-700 animate-pulse"></div>
+                ) : userProfile ? (
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      variant="ghost"
+                      className="text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-lg p-2"
+                      onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    >
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                        {userProfile.firstName?.charAt(0)}{userProfile.lastName?.charAt(0)}
+                      </div>
+                    </Button>
+                  </motion.div>
+                ) : (
+                  <Link href="/login">
+                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-3 py-2 rounded-lg text-sm">
+                      Login
+                    </Button>
+                  </Link>
+                )}
 
                 <AnimatePresence>
-                  {isUserMenuOpen && (
+                  {isUserMenuOpen && userProfile && (
                     <motion.div
                       initial={{ opacity: 0, y: -10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -575,8 +631,10 @@ export function Navbar() {
                             <User className="h-4 w-4 text-white" />
                           </div>
                           <div>
-                            <div className="text-white font-medium text-sm">John Doe</div>
-                            <div className="text-gray-400 text-xs">john@example.com</div>
+                            <div className="text-white font-medium text-sm">
+                              {userProfile.firstName} {userProfile.lastName}
+                            </div>
+                            <div className="text-gray-400 text-xs">{userProfile.email}</div>
                           </div>
                         </div>
                       </div>
@@ -588,7 +646,13 @@ export function Navbar() {
                             <Link 
                               key={item.name} 
                               href={item.href}
-                              onClick={() => setIsUserMenuOpen(false)}
+                              onClick={() => {
+                                if (item.name === "Logout") {
+                                  handleLogout()
+                                } else {
+                                  setIsUserMenuOpen(false)
+                                }
+                              }}
                             >
                               <div className="flex items-center space-x-2 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700/50 cursor-pointer">
                                 <IconComponent className="h-4 w-4" />

@@ -60,16 +60,16 @@ exports.signup = async (req, res) => {
       password: hashedPassword
     });
 
-    const token = jwt.sign(
-      { userId: newUser._id, email: newUser.email },
-      process.env.JWT_SECRET || 'fallback_secret_key',
-      { expiresIn: '24h' }
-    );
+    // const token = jwt.sign(
+    //   { userId: newUser._id, email: newUser.email },
+    //   process.env.JWT_SECRET || 'fallback_secret_key',
+    //   { expiresIn: '24h' }
+    // );
 
     res.status(201).json({
       success: true,
       message: 'User created successfully',
-      token,
+    //   token,
       user: {
         id: newUser._id,
         firstName: newUser.firstName,
@@ -98,9 +98,8 @@ exports.login = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
-    const token = jwt.sign(
-      { userId: user._id, email: user.email },
-      process.env.JWT_SECRET || 'fallback_secret_key',
+    const token = jwt.sign(//tkn
+      { userId: user._id, email: user.email }, 'ILm0yG0tXtyjR1729dVJ5dBVUVN+FHm0dNC8ErHyW6TntpDo5r1azrRP53pdKCkvhnQFDRIfW5CMWUyUV/p6w==',
       { expiresIn: '24h' }
     );
 
@@ -119,4 +118,13 @@ exports.login = async (req, res) => {
     console.error('Login error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
+};
+
+// now get profile protected
+exports.getProfile = async (req, res) => {
+  // already i did middleware
+  res.status(200).json({
+    success: true,
+    user: req.user
+  });
 };
