@@ -1,27 +1,20 @@
-// server.js
-
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const dotenv = require('dotenv');
-
-// Load environment variables
-dotenv.config();
+const mongoose = require('mongoose');
 
 // Initialize Express app
 const app = express();
 
 // Force port 3001
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 
 // ==================== MIDDLEWARE ====================
 app.use(helmet({ contentSecurityPolicy: false }));
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? process.env.CLIENT_URL
-    : 'http://localhost:3000',
+  origin: 'http://localhost:3000',
   credentials: true,
 }));
 
@@ -38,21 +31,40 @@ app.get('/api/v1/health', (req, res) => {
   });
 });
 
+// ==================== DATABASE CONNECTION ====================
+async function connectDB() {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/mydatabase', {
+      autoIndex: true, // build indexes automatically
+      serverSelectionTimeoutMS: 5000, // timeout after 5s if cannot connect
+    });
+    console.log('✅ Connected to MongoDB');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
+    process.exit(1); // Exit app if DB not reachable
+  }
+}
+
 // ==================== SERVER INITIALIZATION ====================
-const server = app.listen(PORT, () => {
-  console.log(`✅ Server is running on port ${PORT}`);
-  console.log(`🚀 API available at http://localhost:${PORT}/api/v1`);
-});
+async function startServer() {
+  await connectDB();
 
-// ==================== ERROR HANDLING ====================
-// Don’t kill server, just log errors
-process.on('unhandledRejection', (err) => {
-  console.error('UNHANDLED REJECTION!', err);
-});
+  const server = app.listen(PORT, () => {
+    console.log(`✅ Server is running on port ${PORT}`);
+    console.log(`🚀 API available at http://localhost:${PORT}/api/v1`);
+  });
 
-process.on('uncaughtException', (err) => {
-  console.error('UNCAUGHT EXCEPTION!', err);
-});
+  // Error handling
+  process.on('unhandledRejection', (err) => {
+    console.error('UNHANDLED REJECTION!', err);
+  });
+
+  process.on('uncaughtException', (err) => {
+    console.error('UNCAUGHT EXCEPTION!', err);
+  });
+}
+
+startServer();
 
 // Export app (optional, for testing)
 // module.exports = app;
