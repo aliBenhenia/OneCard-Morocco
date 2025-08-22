@@ -4,9 +4,13 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth'); // Import auth routes
-
+const path = require("path");
 // Initialize Express app
 const app = express();
+
+// Serve static images
+app.use("/images", express.static(path.resolve("./public/images")));
+
 
 // Force port 3001
 const PORT = 3001;
