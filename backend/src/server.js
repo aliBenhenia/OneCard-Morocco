@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const authRoutes = require('./routes/auth'); // Import auth routes
 
 // Initialize Express app
 const app = express();
@@ -23,6 +24,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ==================== ROUTES ====================
+app.use('/api/auth', authRoutes); // Use auth routes
+
+
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({
     status: 'success',
