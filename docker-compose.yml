@@ -5,7 +5,7 @@ services:
     build: ./backend
     container_name: backend
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
       - MONGO_URL=mongodb://mongo:27017/mydb
       - SECRET_KEY=mysecretkey
@@ -18,7 +18,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - BASE_URL=http://localhost:5000
+      - BASE_URL=http://localhost:5001
     depends_on:
       - backend
 
