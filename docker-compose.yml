@@ -7,8 +7,8 @@ services:
     ports:
       - "5001:5001"
     environment:
-      - MONGO_URL=mongodb://mongo:27017/mydb
-      - SECRET_KEY=mysecretkey
+      - MONGO_URL=mongodb+srv://alibenhenia1:3TkEK63GFAfL8ZZf@cluster0.l3xb1ca.mongodb.net/mydatabase?retryWrites=true&w=majority&appName=Cluster0
+      - SECRET_KEY=ILm0yG0tXtyjR1729dVJ5dBVUVN+FHm0dNC8ErHyW6TntpDo5r1azrRP53pdKCkvhnQFDRIfW5CMWUyUV/p6w==
     depends_on:
       - mongo
 
@@ -21,7 +21,6 @@ services:
       - BASE_URL=http://localhost:5001
     depends_on:
       - backend
-
   mongo:
     image: mongo:7
     container_name: mongo

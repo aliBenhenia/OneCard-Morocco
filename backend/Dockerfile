@@ -10,5 +10,6 @@ COPY . .
 
 EXPOSE 5001
 
+
 # Start backend server in src
 CMD ["node", "src/server.js"]

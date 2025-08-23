@@ -46,10 +46,8 @@ app.get('/api/v1/health', (req, res) => {
 // ==================== DATABASE CONNECTION ====================
 async function connectDB() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/mydatabase', {
-      autoIndex: true, // build indexes automatically
-      serverSelectionTimeoutMS: 5000, // timeout after 5s if cannot connect
-    });
+    await mongoose.connect(
+      process.env.MONGO_URL);
     console.log('✅ Connected to MongoDB');
   } catch (err) {
     console.error('❌ MongoDB connection error:', err.message);
