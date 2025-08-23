@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/contexts/cart-context"
 import type { CartItem } from "@/contexts/cart-context"
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface ProductCardProps {
@@ -46,12 +46,75 @@ export function ProductCard({
   const [isAdding, setIsAdding] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
   const [showQuickView, setShowQuickView] = useState(false)
+  const [flyAnimation, setFlyAnimation] = useState({
+    isVisible: false,
+    startPosition: { x: 0, y: 0 },
+    endPosition: { x: 0, y: 0 }
+  })
+  
+  const cardRef = useRef<HTMLDivElement>(null)
+  const cartIconRef = useRef<HTMLDivElement>(null)
+
+  // Get cart icon position for animation
+  useEffect(() => {
+    const updateCartPosition = () => {
+      if (typeof window !== 'undefined') {
+        const cartElement = document.querySelector('[data-cart-icon]')
+        if (cartElement) {
+          const rect = cartElement.getBoundingClientRect()
+          setFlyAnimation(prev => ({
+            ...prev,
+            endPosition: {
+              x: rect.left + rect.width / 2,
+              y: rect.top + rect.height / 2
+            }
+          }))
+        }
+      }
+    }
+
+    updateCartPosition()
+    window.addEventListener('resize', updateCartPosition)
+    return () => window.removeEventListener('resize', updateCartPosition)
+  }, [])
+
+  const playAddSound = () => {
+    if (typeof window !== 'undefined') {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
+      
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
+      
+      oscillator.type = 'sine'
+      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime) // C5
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
+      
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + 0.3)
+    }
+  }
 
   const isInCart = state.items.some((item) => item.id === id)
   const itemQuantity = state.items.find((item) => item.id === id)?.quantity || 0
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    // Get position of clicked button
+    const rect = (e.target as HTMLElement).getBoundingClientRect()
+    const startX = rect.left + rect.width / 2
+    const startY = rect.top + rect.height / 2
+    
+    setFlyAnimation({
+      isVisible: true,
+      startPosition: { x: startX, y: startY },
+      endPosition: flyAnimation.endPosition
+    })
+    
+    playAddSound()
     setIsAdding(true)
+    
     const item: Omit<CartItem, "quantity"> = {
       id,
       name,
@@ -63,6 +126,7 @@ export function ProductCard({
 
     setTimeout(() => {
       setIsAdding(false)
+      setFlyAnimation(prev => ({ ...prev, isVisible: false }))
     }, 1000)
   }
 
@@ -80,13 +144,44 @@ export function ProductCard({
 
   return (
     <motion.div 
+      ref={cardRef}
       className="relative"
-      whileHover={{ y: -12, scale: 1.02 }}
+      whileHover={{ y: -8 }}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
       onHoverStart={() => setShowQuickView(true)}
       onHoverEnd={() => setShowQuickView(false)}
     >
+      {/* Flying Cart Animation */}
+      <AnimatePresence>
+        {flyAnimation.isVisible && (
+          <motion.div
+            className="fixed z-50 pointer-events-none"
+            initial={{
+              x: flyAnimation.startPosition.x,
+              y: flyAnimation.startPosition.y,
+              opacity: 1,
+              scale: 1
+            }}
+            animate={{
+              x: flyAnimation.endPosition.x,
+              y: flyAnimation.endPosition.y,
+              opacity: 0,
+              scale: 0.3
+            }}
+            transition={{
+              duration: 0.8,
+              ease: "easeInOut"
+            }}
+            onAnimationComplete={() => setFlyAnimation(prev => ({ ...prev, isVisible: false }))}
+          >
+            <div className="bg-blue-500 rounded-full p-2 shadow-lg">
+              <ShoppingCart className="h-4 w-4 text-white" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Quick View Overlay */}
       <AnimatePresence>
         {showQuickView && (
@@ -152,7 +247,7 @@ export function ProductCard({
               src={image || "/placeholder.svg"}
               alt={name}
               className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.5 }}
             />
             

@@ -4,7 +4,10 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth'); // Import auth routes
+const { router: productRoutes, autoSeedProducts } = require('./routes/products');
+const { router: orderRoutes } = require('./routes/orders');
 const path = require("path");
+// import authMiddleware from './middleware/auth';
 // Initialize Express app
 const app = express();
 
@@ -29,7 +32,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ==================== ROUTES ====================
 app.use('/api/auth', authRoutes); // Use auth routes
-
+app.use('/api/products', productRoutes); // Use product routes
+app.use('/api/payment', orderRoutes); // Use order/payment routes
 
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({

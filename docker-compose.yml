@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./back
+    container_name: backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/mydb
+      - SECRET_KEY=mysecretkey
+    depends_on:
+      - mongo
+
+  frontend:
+    build: ./front
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - BASE_URL=http://localhost:5000
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

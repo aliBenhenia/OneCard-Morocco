@@ -227,7 +227,7 @@ export function Navbar() {
   ]
 
   const userMenuItems = [
-    { name: "My Account", icon: User, href: "/" },
+    { name: "My Account", icon: User, href: "/profile" },
     { name: "My Orders", icon: Package, href: "/" },
     { name: "Wishlist", icon: Heart, href: "/" },
     { name: "Notifications", icon: Bell, href: "/" },
@@ -295,10 +295,10 @@ export function Navbar() {
 
   const bottomNavItems = [
     { name: "Home", icon: Home, href: "/" },
-    { name: "Categories", icon: Grid3X3, href: "/categories" },
-    { name: "Search", icon: Search, href: "/search" },
-    { name: "Cart", icon: ShoppingCart, href: "/cart" },
-    { name: "Account", icon: User, href: "/account" },
+    { name: "Categories", icon: Grid3X3, href: "/products" },
+    { name: "Search", icon: Search, href: "/" },
+    { name: "Cart", icon: ShoppingCart, href: "/" },
+    { name: "Profile", icon: User, href: "/profile" },
   ]
 
   // Calculate navbar transform based on scroll

@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import api from "@/api"
 
 interface PaymentMethod {
   id: string
@@ -204,28 +205,51 @@ export default function PaymentPage() {
     setIsProcessing(true)
     setPaymentStatus("processing")
 
-    // Simulate payment processing with realistic steps
     try {
-      // Step 1: Validating payment
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      
-      // Step 2: Processing transaction
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      
-      // Step 3: Finalizing payment
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // Prepare payment data
+      const paymentData = {
+        billingInfo: {
+          email: formData.email,
+          address: formData.billingAddress,
+          city: formData.city,
+          zipCode: formData.zipCode,
+          country: formData.country
+        },
+        cardInfo: selectedMethod === "card" ? {
+          cardNumber: formData.cardNumber,
+          expiryDate: formData.expiryDate,
+          cvv: formData.cvv,
+          cardName: formData.cardName
+        } : undefined,
+        paymentMethod: selectedMethod,
+        amount: finalTotal,
+        tax: tax,
+        cartItems: cartItems,
+        // In a real app, you would get the userId from context or authentication
+        // userId: "USER_ID_PLACEHOLDER" // Replace with actual user ID
+      }
 
-      // Simulate random success/failure for demo
-      const success = Math.random() > 0.2 // 80% success rate
+      // Send payment request to server
+      const userToken = localStorage.getItem("token");
+      if (!userToken) {
+        setPaymentStatus("error");
+        setErrorMessage("User not authenticated");
+        return;
+      }
+      const response = await api.post("/api/payment/process", paymentData, {
+        headers: {
+          Authorization: `Bearer ${userToken}`
+        }
+      });
 
-      if (success) {
+      if (response.data.success) {
         setPaymentStatus("success")
       } else {
-        throw new Error("Payment declined. Please try a different payment method.")
+        throw new Error(response.data.message || "Payment failed. Please try again.")
       }
-    } catch (error) {
+    } catch (error: any) {
       setPaymentStatus("error")
-      setErrorMessage(error instanceof Error ? error.message : "Payment failed. Please try again.")
+      setErrorMessage(error.response?.data?.message || "Payment failed. Please try again.")
     } finally {
       setIsProcessing(false)
     }

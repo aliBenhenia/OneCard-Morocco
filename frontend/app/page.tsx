@@ -6,133 +6,78 @@ import { HeroSection } from "@/components/hero-section"
 import { CategoryIcons } from "@/components/category-icons"
 import { ProductSlider } from "@/components/product-slider"
 import { Footer } from "@/components/footer"
-import {AboutPage} from "@/components/about"
+import { AboutPage } from "@/components/about"
 import { HeroSkeleton, ProductSliderSkeleton, CategoryIconSkeleton } from "@/components/skeleton-loader"
-
-const offersProducts = [
-  {
-    id: "1",
-    name: "Yalla Ludo - USD 100 Diamonds (INT)",
-    price: 356.25,
-    originalPrice: 375,
-    image: "/placeholder-w9a1p.png",
-    rating: 4.8,
-    reviewCount: 1250,
-    category: "Gaming",
-    discount: 5,
-  },
-  {
-    id: "2",
-    name: "Amazon (US) Gift Card - USD 50",
-    price: 195,
-    originalPrice: 205,
-    image: "/amazon-gift-card-orange.png",
-    rating: 4.9,
-    reviewCount: 890,
-    category: "Retail",
-    discount: 5,
-  },
-  {
-    id: "3",
-    name: "Razer Gold - $100 (Global)",
-    price: 355,
-    originalPrice: 375,
-    image: "/placeholder-wuh9i.png",
-    rating: 4.7,
-    reviewCount: 2100,
-    category: "Gaming",
-    discount: 5,
-  },
-  {
-    id: "4",
-    name: "Apple & iTunes Giftcard $100 (US Store)",
-    price: 363,
-    originalPrice: 382,
-    image: "/itunes-gift-card-pink.png",
-    rating: 4.9,
-    reviewCount: 3200,
-    category: "Entertainment",
-    discount: 5,
-  },
-]
-
-const recentlyAdded = [
-  {
-    id: "5",
-    name: "Razer Gold - $200 (Global)",
-    price: 730,
-    originalPrice: 750,
-    image: "/razer-gold-black-card-200.png",
-    rating: 4.7,
-    reviewCount: 420,
-    category: "Gaming",
-    discount: 3,
-  },
-  {
-    id: "6",
-    name: "Yalla Ludo - USD 100 Diamonds (INT)",
-    price: 356.25,
-    originalPrice: 375,
-    image: "/yalla-ludo-teal-card.png",
-    rating: 4.8,
-    reviewCount: 650,
-    category: "Gaming",
-    discount: 5,
-  },
-  {
-    id: "7",
-    name: "Ludo Club $100 - 50M Coin",
-    price: 365,
-    originalPrice: 385,
-    image: "/placeholder-1kt6x.png",
-    rating: 4.9,
-    reviewCount: 1100,
-    category: "Gaming",
-    discount: 5,
-  },
-  {
-    id: "8",
-    name: "Red Bull Data Recharge Card 100GB For 3 Months",
-    price: 253,
-    image: "/generic-energy-drink-data-card.png",
-    rating: 4.6,
-    reviewCount: 380,
-    category: "Mobile",
-  },
-  {
-    id: "9",
-    name: "Google Play Gift Card - $50",
-    price: 195,
-    originalPrice: 205,
-    image: "/generic-energy-drink-data-card.png",
-    rating: 4.8,
-    reviewCount: 1500,
-    category: "Entertainment",
-    discount: 5,
-  },
-  {
-    id: "10",
-    name: "Spotify Premium Gift Card - $30",
-    price: 195,
-    originalPrice: 205,
-    image: "/generic-energy-drink-data-card.png",
-    rating: 4.8,
-    reviewCount: 1500,
-    category: "Entertainment",
-    discount: 5,
-  },
-]
+import api from "@/api"
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true)
+  const [offersProducts, setOffersProducts] = useState([])
+  const [recentlyAdded, setRecentlyAdded] = useState([])
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1500) // Simulate 1.5 second loading time
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true)
+        const response = await api.get("/api/products")
+        
+        if (response.data.success) {
+          const products = response.data.data
+          
+          // Split products into offers and recently added (mock logic)
+          const offers = products.slice(0, 4)
+          const recentlyAddedProducts = products.slice(4, 10)
+          
+          setOffersProducts(offers)
+          setRecentlyAdded(recentlyAddedProducts)
+        } else {
+          setError("Failed to load products")
+          setIsLoading(false)
+        }
+      } catch (err) {
+        console.error("Error fetching products:", err)
+        setError("Failed to load products. Please try again later.")
+      } finally {
+        setIsLoading(false)
+        // Simulate minimum loading time for better UX
+        // setTimeout(() => {
+        //   setIsLoading(false)
+        // }, 1000)
+      }
+    }
 
-    return () => clearTimeout(timer)
+    fetchProducts()
   }, [])
+
+  // Group products by category for sliders
+  const groupProductsByCategory = (products) => {
+    const grouped = {}
+    products.forEach(product => {
+      if (!grouped[product.category]) {
+        grouped[product.category] = []
+      }
+      grouped[product.category].push(product)
+    })
+    return grouped
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center">
+        <div className="text-center p-8 bg-red-900/20 border border-red-700 rounded-xl max-w-md">
+          <h2 className="text-xl font-bold text-white mb-2">Oops! Something went wrong</h2>
+          <p className="text-gray-300 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#1a1a1a]">
@@ -140,16 +85,16 @@ export default function HomePage() {
 
       {isLoading ? (
         <>
-          <HeroSkeleton />
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* <HeroSkeleton /> */}
+          {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 mb-12">
               {Array.from({ length: 8 }).map((_, i) => (
                 <CategoryIconSkeleton key={i} />
               ))}
             </div>
-            <ProductSliderSkeleton />
-            <ProductSliderSkeleton />
-          </div>
+            </div> */}
+             <ProductSliderSkeleton />
+             <ProductSliderSkeleton />
         </>
       ) : (
         <>
