@@ -21,10 +21,7 @@ const PORT = 3001;
 // ==================== MIDDLEWARE ====================
 app.use(helmet({ contentSecurityPolicy: false }));
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-}));
+app.use(cors());
 
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
@@ -43,11 +40,10 @@ app.get('/api/v1/health', (req, res) => {
   });
 });
 
-// ==================== DATABASE CONNECTION ====================
+// ==================== DATABASE CONNECTION ====================http://24.144.89.212:5001/
 async function connectDB() {
   try {
-    await mongoose.connect(
-      process.env.MONGO_URL);
+    await mongoose.connect("mongodb+srv://alibenhenia1:3TkEK63GFAfL8ZZf@cluster0.l3xb1ca.mongodb.net/mydatabase?retryWrites=true&w=majority&appName=Cluster0");
     console.log('✅ Connected to MongoDB');
   } catch (err) {
     console.error('❌ MongoDB connection error:', err.message);
