@@ -8,7 +8,7 @@ RUN npm install --legacy-peer-deps
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 5001
 
 # Start backend server in src
-CMD ["node", "src/index.js"]
+CMD ["node", "src/server.js"]
