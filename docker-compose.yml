@@ -15,3 +15,7 @@ services:
       - NEXT_PUBLIC_API_URL=http://24.144.89.212:4001
     depends_on:
       - backend_new   # ✅ استخدم الاسم الجديد هنا
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
