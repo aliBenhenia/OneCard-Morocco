@@ -24,7 +24,7 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
   origin: '*', // يسمح لأي دومين
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true // لاحظ: لا يمكن استخدام credentials مع origin = '*'
+  // credentials: true // لاحظ: لا يمكن استخدام credentials مع origin = '*'
 }));
 
 app.use(morgan('dev'));
