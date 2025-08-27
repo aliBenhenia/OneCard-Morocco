@@ -15,8 +15,8 @@ const app = express();
 app.use("/images", express.static(path.resolve("./public/images")));
 
 
-// Force port 3001
-const PORT = 3001;
+// Force port 4001
+const PORT = 4001;
 
 // ==================== MIDDLEWARE ====================
 app.use(helmet({ contentSecurityPolicy: false }));
