@@ -1,3 +1,4 @@
+// Updated ProductCard.jsx
 "use client"
 
 import { ShoppingCart, Plus, Star, Shield, Heart, Zap, Award, Clock } from "lucide-react"
@@ -8,6 +9,7 @@ import { useCart } from "@/contexts/cart-context"
 import type { CartItem } from "@/contexts/cart-context"
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useRouter } from "next/navigation"
 
 interface ProductCardProps {
   id: string
@@ -52,6 +54,7 @@ export function ProductCard({
     endPosition: { x: 0, y: 0 }
   })
   
+  const router = useRouter()
   const cardRef = useRef<HTMLDivElement>(null)
   const cartIconRef = useRef<HTMLDivElement>(null)
 
@@ -128,6 +131,29 @@ export function ProductCard({
       setIsAdding(false)
       setFlyAnimation(prev => ({ ...prev, isVisible: false }))
     }, 1000)
+  }
+
+  const handleBuyNow = () => {
+    // Store complete product info in localStorage
+    const productInfo = {
+      id,
+      name,
+      price,
+      originalPrice,
+      image,
+      rating,
+      reviewCount,
+      category,
+      discount,
+      badge,
+      trending,
+      featured,
+      deliveryTime,
+      stock
+    }
+    
+    localStorage.setItem(`product_${id}`, JSON.stringify(productInfo))
+    router.push(`/products/${id}`)
   }
 
   const handleRemoveFromCart = () => {
@@ -233,7 +259,7 @@ export function ProductCard({
           className="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-all duration-200"
           whileHover={{ scale: 1.1, rotate: [0, -10, 10, 0] }}
           whileTap={{ scale: 0.9 }}
-          onClick={() => setIsLiked(!isLiked)}
+          onClick={() => router.push(`/products/${id}`)}
         >
           <Heart 
             className={`h-4 w-4 ${isLiked ? 'text-red-500 fill-current' : 'text-white'}`} 
@@ -310,10 +336,10 @@ export function ProductCard({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col space-y-2">
               {/* Add to Cart Button */}
               <motion.div 
-                className="flex-1"
+                className="w-full"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -358,19 +384,19 @@ export function ProductCard({
                 )}
               </motion.div>
 
-              {/* Quick Add Button */}
+              {/* Buy Now Button */}
               <motion.div 
-                whileHover={{ scale: 1.1, rotate: 90 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <Button
-                  onClick={handleAddToCart}
-                  variant="outline"
+                  onClick={handleBuyNow}
+                  disabled={stock === 0}
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-sm py-2 px-4 rounded-lg disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl"
                   size="sm"
-                  className="p-2 border-gray-600 text-gray-400 hover:text-white hover:border-blue-500 bg-transparent hover:bg-blue-600/20 rounded-lg"
-                  disabled={isAdding || stock === 0}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Zap className="h-4 w-4 mr-2" />
+                  Buy Now
                 </Button>
               </motion.div>
             </div>

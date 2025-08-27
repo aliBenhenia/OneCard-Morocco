@@ -8,7 +8,7 @@ RUN npm install --legacy-peer-deps
 
 COPY . .
 
-EXPOSE 3001
+# EXPOSE 3001
 
 
 # Start backend server in src

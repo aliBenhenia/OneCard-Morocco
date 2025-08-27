@@ -21,7 +21,11 @@ const PORT = 3001;
 // ==================== MIDDLEWARE ====================
 app.use(helmet({ contentSecurityPolicy: false }));
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // Replace with your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
