@@ -1,17 +1,17 @@
 version: "3.9"
 services:
-  backend:
+  backend_new:
+    container_name: backend_new
     build: ./backend
-    container_name: backend
     ports:
       - "4001:4001"
+
   frontend:
     build: ./frontend
-    container_name: frontend
+    container_name: frontend_v2
     ports:
       - "4000:4000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://24.144.89.212:4001 # Update with your server's IP address
+      - NEXT_PUBLIC_API_URL=http://24.144.89.212:4001
     depends_on:
-      - backend
-
+      - backend_new   # ✅ استخدم الاسم الجديد هنا
