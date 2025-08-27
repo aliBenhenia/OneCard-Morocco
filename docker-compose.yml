@@ -10,6 +10,8 @@ services:
     container_name: frontend
     ports:
       - "4000:4000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://24.144.89.212:4001 # Update with your server's IP address
     depends_on:
       - backend
 

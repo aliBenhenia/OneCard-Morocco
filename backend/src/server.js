@@ -22,9 +22,9 @@ const PORT = 4001;
 app.use(helmet({ contentSecurityPolicy: false }));
 
 app.use(cors({
-  origin: 'http://localhost:3000', // Replace with your frontend URL
+  origin: '*', // يسمح لأي دومين
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  credentials: true // لاحظ: لا يمكن استخدام credentials مع origin = '*'
 }));
 
 app.use(morgan('dev'));
