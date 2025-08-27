@@ -10,7 +10,7 @@ services:
     build: ./frontend
     container_name: frontend_v2
     ports:
-      - "4000:4000"
+    - "4000:3000"  # الخارجي : الداخلي
     environment:
       - NEXT_PUBLIC_API_URL=http://24.144.89.212:4001
     depends_on:
