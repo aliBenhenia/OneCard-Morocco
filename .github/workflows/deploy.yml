@@ -1,36 +1,29 @@
-name: CI/CD
+name: Deploy to VPS
 
 on:
   push:
     branches:
-      - main
+      - main   # change if your branch is different
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      # Build & push Docker image
-      - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
-
-      - name: Build and push image
-        run: |
-          IMAGE=mydockeruser/myapp
-          TAG=$(date +%s) # unique tag (or use $GITHUB_SHA)
-          docker build -t $IMAGE:$TAG -t $IMAGE:latest .
-          docker push $IMAGE:$TAG
-          docker push $IMAGE:latest
-
-      # Deploy on VPS
       - name: Deploy to VPS
         run: |
           sshpass -p "${{ secrets.VPS_PASS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd v1
-            docker compose pull
+            git pull origin main
+            # Rebuild frontend_v2 without cache
+            docker compose build --no-cache frontend_v2
+
+            # Rebuild other services (with cache, faster)
+            docker compose build
+
+            # Restart everything
+            docker compose down
             docker compose up -d
-            docker image prune -f   # cleanup old images
           EOF
