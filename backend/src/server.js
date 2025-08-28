@@ -22,7 +22,7 @@ const PORT = 4001;
 app.use(helmet({ contentSecurityPolicy: false }));
 
 app.use(cors({
-  origin: '*', // يسمح لأي دومين
+  origin: "http://24.144.89.212:4000",
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   // credentials: true // لاحظ: لا يمكن استخدام credentials مع origin = '*'
 }));
