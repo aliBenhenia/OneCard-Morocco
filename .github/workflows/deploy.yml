@@ -16,14 +16,18 @@ jobs:
         run: |
           sshpass -p "${{ secrets.VPS_PASS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd v1
-            git pull origin main
-            # Rebuild frontend_v2 without cache
+
+            # 1️⃣ Reset local repo to match GitHub (discard local changes)
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            # 2️⃣ Rebuild frontend_v2 without cache
             docker compose build --no-cache frontend_v2
 
-            # Rebuild other services (with cache, faster)
-            docker compose build
+            # 3️⃣ Restart all services (will rebuild any changed service)
+            docker compose up -d --build
 
-            # Restart everything
-            docker compose down
-            docker compose up -d
+            # Optional: clean dangling images to save space
+            docker image prune -f
           EOF
