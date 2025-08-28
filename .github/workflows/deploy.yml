@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main   # your branch
+      - main
 
 jobs:
   deploy:
@@ -17,17 +17,17 @@ jobs:
           sshpass -p "${{ secrets.VPS_PASS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd v1
 
-            # 1️⃣ Reset local repo to match GitHub
+            # Reset local repo to match GitHub
             git fetch origin main
             git reset --hard origin/main
             git clean -fd
 
-            # 2️⃣ Rebuild frontend without cache and force pull (IPv4)
-            docker compose build --no-cache --pull --platform linux/amd64 frontend
+            # Rebuild frontend without cache
+            docker compose build --no-cache frontend
 
-            # 3️⃣ Restart all services (rebuild changed services)
+            # Rebuild/Start all services
             docker compose up -d --build
 
-            # 4️⃣ Clean dangling images to save space
+            # Clean dangling images
             docker image prune -f
           EOF
