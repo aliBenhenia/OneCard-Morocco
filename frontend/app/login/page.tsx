@@ -60,7 +60,7 @@ export default function LoginPage() {
 
         <Card className="bg-[#2a2a2a] border-gray-700">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-white text-center">Welcome back</CardTitle>
+            <CardTitle className="text-2xl font-bold text-white text-center">Welcome back...</CardTitle>
             <CardDescription className="text-gray-400 text-center">Sign in to your OneCard account</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
