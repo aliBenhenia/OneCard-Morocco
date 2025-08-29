@@ -31,7 +31,7 @@ services:
     ports:
       - "4000:3000"  # الخارجي : الداخلي
     environment:
-      - NEXT_PUBLIC_API_URL=http://24.144.89.212:4001   # استخدم IP VPS هنا
+      - NEXT_PUBLIC_API_URL=http://134.209.238.127:4001   # استخدم IP VPS هنا
     depends_on:
       - backend_new
     restart: always
