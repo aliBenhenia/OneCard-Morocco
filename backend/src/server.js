@@ -22,8 +22,9 @@ const PORT = 4001;
 app.use(helmet({ contentSecurityPolicy: false }));
 
 app.use(cors({
-  origin: '*',        // أي domain
-  methods: ['GET','POST','PUT','DELETE']
+  origin: 'http://134.209.238.127:4000',  // frontend URL
+  methods: ['GET','POST','PUT','DELETE'],
+  credentials: true
 }));
 
 app.use(morgan('dev'));
