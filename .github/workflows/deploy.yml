@@ -17,17 +17,15 @@ jobs:
           sshpass -p "${{ secrets.VPS_PASS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd v1
 
-            # Reset local repo to match GitHub
-            git fetch origin main
-            git reset --hard origin/main
-            git clean -fd
+            # # Reset local repo to match GitHub
+            # git fetch origin main
+            # git reset --hard origin/main
+            # git clean -fd
 
-            # Rebuild frontend without cache
-            docker compose build --no-cache frontend
 
+
+            git pull origin main
             # Rebuild/Start all services
+            docker compose down
             docker compose up -d --build
-
-            # Clean dangling images
-            docker image prune -f
           EOF

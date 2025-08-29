@@ -372,7 +372,7 @@ export function Navbar() {
                 </div>
                 <div className="hidden sm:block">
                   <span className="text-white text-xl font-bold">OneCard</span>
-                  <div className="text-xs text-gray-400 -mt-1">Digital Marketplace(1)</div>
+                  <div className="text-xs text-gray-400 -mt-1">Digital Marketplace(2)</div>
                 </div>
               </Link>
             </motion.div>
