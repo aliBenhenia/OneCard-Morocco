@@ -18,7 +18,9 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
-      - MONGO_URI=mongodb://mongo:27017/mydb   # ربط backend بـ MongoDB
+      # - MONGO_URI=mongodb://mongo:27017/mydb   # ربط backend بـ MongoDB
+      - MONGO_URI=mongodb+srv://alibenhenia1:3TkEK63GFAfL8ZZf@cluster0.l3xb1ca.mongodb.net/mydatabase?retryWrites=true&w=majority&appName=Cluster0   # ربط backend بـ MongoDB
+      - FRONTEND_URL=http://134.209.238.127:4000 # change to vps ip, this used for cors
     depends_on:
       - mongo
     volumes:

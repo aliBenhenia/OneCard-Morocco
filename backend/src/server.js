@@ -22,7 +22,7 @@ const PORT = 4001;
 app.use(helmet({ contentSecurityPolicy: false }));
 
 app.use(cors({
-  origin: 'http://134.209.238.127:4000',  // frontend URL
+  origin: process.env.FRONTEND_URL || 'http://localhost:4000',
   methods: ['GET','POST','PUT','DELETE'],
   credentials: true
 }));
@@ -45,7 +45,8 @@ app.get('/api/v1/health', (req, res) => {
 });
 
 // ==================== DATABASE CONNECTION ====================
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://alibenhenia1:3TkEK63GFAfL8ZZf@cluster0.l3xb1ca.mongodb.net/mydatabase?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URI = process.env.MONGO_URI 
+// || "mongodb+srv://alibenhenia1:3TkEK63GFAfL8ZZf@cluster0.l3xb1ca.mongodb.net/mydatabase?retryWrites=true&w=majority&appName=Cluster0";
 async function connectDB() {
   try {
     await mongoose.connect(MONGO_URI);
