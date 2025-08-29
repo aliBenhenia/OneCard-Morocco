@@ -1,21 +1,41 @@
 version: "3.9"
+
 services:
+  mongo:
+    container_name: mongo
+    image: mongo:6
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-data:/data/db
+
   backend_new:
     container_name: backend_new
     build: ./backend
     ports:
       - "4001:4001"
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo:27017/mydb   # ربط backend بـ MongoDB
+    depends_on:
+      - mongo
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
 
   frontend:
-    build: ./frontend
     container_name: frontend_v2
+    build: ./frontend
     ports:
-    - "4000:3000"  # الخارجي : الداخلي
+      - "4000:3000"  # الخارجي : الداخلي
     environment:
-      - NEXT_PUBLIC_API_URL=http://24.144.89.212:4001
+      - NEXT_PUBLIC_API_URL=http://24.144.89.212:4001   # استخدم IP VPS هنا
     depends_on:
-      - backend_new   # ✅ استخدم الاسم الجديد هنا
-    # volumes:
-    #   - ./frontend:/app
-    #   - /app/node_modules
-    #   - /app/.next
+      - backend_new
+    restart: always
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next

@@ -22,9 +22,8 @@ const PORT = 4001;
 app.use(helmet({ contentSecurityPolicy: false }));
 
 app.use(cors({
-  origin: "http://24.144.89.212:4000",
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  // credentials: true // لاحظ: لا يمكن استخدام credentials مع origin = '*'
+  origin: '*',        // أي domain
+  methods: ['GET','POST','PUT','DELETE']
 }));
 
 app.use(morgan('dev'));
@@ -44,10 +43,11 @@ app.get('/api/v1/health', (req, res) => {
   });
 });
 
-// ==================== DATABASE CONNECTION ====================http://24.144.89.212:5001/
+// ==================== DATABASE CONNECTION ====================
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://alibenhenia1:3TkEK63GFAfL8ZZf@cluster0.l3xb1ca.mongodb.net/mydatabase?retryWrites=true&w=majority&appName=Cluster0";
 async function connectDB() {
   try {
-    await mongoose.connect("mongodb+srv://alibenhenia1:3TkEK63GFAfL8ZZf@cluster0.l3xb1ca.mongodb.net/mydatabase?retryWrites=true&w=majority&appName=Cluster0");
+    await mongoose.connect(MONGO_URI);
     console.log('✅ Connected to MongoDB');
   } catch (err) {
     console.error('❌ MongoDB connection error:', err.message);
