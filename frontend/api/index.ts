@@ -1,7 +1,8 @@
 const axios = require('axios');
 
 // Create an Axios instance with baseURL + config
-const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001';
+// const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001';
+const baseURL = 'https://134.209.238.127.sslip.io';
 const api = axios.create({
   baseURL: baseURL,
   timeout: 10000, // 10s timeout
