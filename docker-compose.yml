@@ -21,7 +21,7 @@ services:
       - NODE_ENV=production
       # - MONGO_URI=mongodb://mongo:27017/mydb   # ربط backend بـ MongoDB
       - MONGO_URI=mongodb+srv://alibenhenia1:3TkEK63GFAfL8ZZf@cluster0.l3xb1ca.mongodb.net/mydatabase?retryWrites=true&w=majority&appName=Cluster0   # ربط backend بـ MongoDB
-      - FRONTEND_URL=http://134.209.238.127:4000 # change to vps ip, this used for cors
+      - FRONTEND_URL=https://one-card-morocco.vercel.app # change to vps ip, this used for cors
     # depends_on:
     #   - mongo
     volumes:
@@ -34,7 +34,7 @@ services:
     ports:
       - "4000:3000"  # الخارجي : الداخلي
     environment:
-      - NEXT_PUBLIC_API_URL=http://134.209.238.127:4001   # استخدم IP VPS هنا
+      - NEXT_PUBLIC_API_URL=https://134.209.238.127.sslip.io   # استخدم IP VPS هنا
     depends_on:
       - backend_new
     restart: always
