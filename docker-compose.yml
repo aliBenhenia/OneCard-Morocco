@@ -1,15 +1,14 @@
 version: "3.9"
 
 services:
-# for test use
-  # mongo:
-  #   container_name: mongo
-  #   image: mongo:6
-  #   restart: always
-  #   ports:
-  #     - "27017:27017"
-  #   volumes:
-  #     - ./mongo-data:/data/db
+  mongo:
+    container_name: mongo
+    image: mongo:6
+    restart: always
+    ports:
+      - "27017:27017" # Allows you to connect via Compass/TablePlus on your host
+    volumes:
+      - ./mongo-data:/data/db # Persists your data even if the container stops
 
   backend_new:
     container_name: backend_new
@@ -18,12 +17,12 @@ services:
       - "4001:4001"
     restart: always
     environment:
-      - NODE_ENV=production
-      # - MONGO_URI=mongodb://mongo:27017/mydb   # ربط backend بـ MongoDB
-      - MONGO_URI=mongodb+srv://alibenhenia1:3TkEK63GFAfL8ZZf@cluster0.l3xb1ca.mongodb.net/mydatabase?retryWrites=true&w=majority&appName=Cluster0   # ربط backend بـ MongoDB
-      - FRONTEND_URL=https://one-card-morocco.vercel.app # change to vps ip, this used for cors
-    # depends_on:
-    #   - mongo
+      - NODE_ENV=development
+      # Internal connection: 'mongo' is the service name defined above
+      - MONGO_URI=mongodb://mongo:27017/mydatabase
+      - FRONTEND_URL=http://localhost:4000
+    depends_on:
+      - mongo
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -32,9 +31,10 @@ services:
     container_name: frontend_v2
     build: ./frontend
     ports:
-      - "4000:3000"  # الخارجي : الداخلي
+      - "4000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=https://134.209.238.127.sslip.io   # استخدم IP VPS هنا
+      # Browser connection: Accesses the backend via the exposed port on host
+      - NEXT_PUBLIC_API_URL=http://localhost:4001
     depends_on:
       - backend_new
     restart: always
